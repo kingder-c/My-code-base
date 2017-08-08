@@ -1,2 +1,0 @@
-# wContour
-Contour related algorithms

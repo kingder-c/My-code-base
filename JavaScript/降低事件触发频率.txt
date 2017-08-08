@@ -1,0 +1,49 @@
+// 定义，参数 interval 决定触发的最小间隔
+var samplingRate = function(interval) {
+  var mark;
+  mark = 0;
+  return function() {
+    var now;
+    now = Date.now();
+    if (now - mark < interval) {
+      return false;
+    }
+    return mark = now;
+  };
+};
+ 
+// 使用，将“采样”的时间间隔限制在 1000ms
+var sampling = samplingRate(1000);
+ 
+// 用 setInterval 进行演示
+setInterval(function() {
+  // 100ms 触发1次
+  console.log('事件被触发');
+ 
+  // 间隔超过 1000ms 时 sampling() 为真，否则为假
+  if (sampling()) {
+    // 1000ms 触发1次
+    return console.log('只对这次事件进行处理');
+  }
+}, 100);
+
+
+
+
+
+
+全局变量
+var mark;
+mark = 0;
+var now;
+事件内：
+now = Date.now();
+    if (now - mark < 1000) {
+        return;
+    }
+    else {
+        //要执行的事件
+        mark = now
+
+    }
+    // 1000ms 触发1次

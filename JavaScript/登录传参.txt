@@ -1,0 +1,97 @@
+/* 登录 */
+LoginSend = function (n, p) {
+
+    var name = jQuery.trim(jQuery("#txtUserName").val() || n);
+    var passW = jQuery.trim(jQuery("#txtPassword").val() || p);
+
+    if (!name) {
+
+        alert('请输入用户名');
+        return false;
+    } else if (!passW) {
+
+        alert('请输入密码');
+        return false;
+    }
+    if (jQuery("#chkRemember").is(':checked')) {
+        jQuery.cookie("loginUserName", name, { expires: 7 });
+        jQuery.cookie("loginUserPassword", passW, { expires: 7 });
+    } else {
+        jQuery.removeCookie('loginUserName');
+        jQuery.removeCookie('loginUserPassword');
+    }
+
+    jQuery.getJSON("NetCode/LoginAuthorize.ashx", { Action: "Verify", un: name, pw: passW },
+      function (data) {
+          if (data.YHMC == name) {
+              GetUserInfoCallback(data);
+          } else {
+              alert("对不起,无法进行系统登陆,请检查用户名或密码输入是否正确?\r\n如果确认无误,请联系管理员启用账户!");
+          }
+      });
+};
+
+
+/* 取消登录 */
+LoginCancle = function () {
+    jQuery("#password").val("");
+    jQuery("#username").val("");
+};
+
+//登录回调函数
+function LoginCallback(reply) {
+
+    if (reply == "yes") {
+        jQuery.getScript(Robin.Setting.GlobalSetting.SystemService +
+                         "/Handler/LoginWithBack.ashx?f=json&cb=GetUserInfoCallback");
+    }
+    else {
+        alert("对不起,无法进行系统登陆,请检查用户名或密码输入是否正确,如果确认无误,请联系管理员启用账户!");
+    }
+}
+
+//UserInfo回调函数
+function GetUserInfoCallback(data) {
+
+    //分别保存只是在保存的时候麻烦，如果保存成字符串每次用都会麻烦
+    var Times = "";
+    var lastTime = null;
+    if (lastTime == null) {
+        Times = "";
+    }
+    else {
+
+        Times = lastTime.toString().substring(0, 4) + "-";
+        Times += lastTime.toString().substring(4, 6) + "-";
+        Times += lastTime.toString().substring(6, 8) + " ";
+        Times += lastTime.toString().substring(8, 10) + ":";
+        Times += lastTime.toString().substring(10, 12) + ":";
+        Times += lastTime.toString().substring(12, 14);
+    }
+
+    jQuery.ajax({
+        type: 'POST',
+        url: 'NetCode/LoginAuthorize.ashx?Action=Login',
+        data: {
+            UserId: data.GUID,
+            UserName: data.YHMC,
+            AliasName: data.EXTEND1,
+            UserRole: data.YHJS,
+            Times: Times
+        },
+        success: function () {
+            //location.href = "mainpage.aspx";
+            //var roleID = Robin.Utils.UrlEncryption(data.YHJS);           
+            //location.href = "mainpage.html?sid=" + encodeURIComponent(encodeURIComponent(roleID)) + "!" + data.GUID;
+            ////location.href = "MainPage.aspx?sid=" + encodeURIComponent(encodeURIComponent(roleID));
+            var roleID = Robin.Utils.UrlEncryption(data.YHJS);
+            location.href = "mainpage.aspx?sid=" + encodeURIComponent(encodeURIComponent(roleID));
+        }
+    });
+    
+}
+
+
+
+
+

@@ -1,0 +1,136 @@
+﻿上网查了一下Ext.onReady()的用法，大概分为三种：
+
+方式一:
+          <script>
+
+           Ext.onReady(function(){
+
+           alert('onready');
+
+ 
+
+       });
+
+    </script>     
+              最简单了,最平常的调用,不用多说
+
+ 
+
+方式二:
+    <script>
+
+       Ext.color=function(){
+           return{
+
+              init:function(){
+
+                  alert("init")
+
+              }
+
+           }
+
+       }();
+
+       Ext.onReady(Ext.color.init,Ext.color);
+
+    </script>                
+
+  通过onReady调用color函数,init为color中的内置,作用是初始化.这种写法比较实用
+
+ 
+
+方式三:
+ 
+
+    <script>
+
+       Ext.onReady(function(){
+
+      
+
+           alert('onready');
+
+ 
+
+       });
+
+       Ext.color=function(){
+
+           return{
+
+              init:function(){
+
+                  alert("init")
+
+              }
+
+           }
+
+       }();
+
+       Ext.onReady(Ext.color.init,Ext.color);
+
+    </script>
+
+       这种是混合型写法,两个onReady都会被调用,调用顺序是看谁在前面.
+
+根据第2个方法，可将问题的解法写成如下：
+
+<script>
+  Ext.f=function(){ 
+           return{
+
+              init:function(){
+         Ext.Msg.show({
+         title:'Hello',
+         msg:'Have you seen my heart?',
+         buttons:{
+          yes:true,
+          no:true,
+          cancel:true,
+          },
+
+          icon:'milton-icon',
+          fn:function(btn){
+          Ext.Msg.alert('You clicked',btn);
+
+          }
+         });
+
+              }
+
+           }
+
+       }();
+
+       Ext.onReady(Ext.f.init,Ext.f);
+
+    </script>
+	
+	
+	官网实例
+	Ext.onReady(function(){
+    var window = Ext.createWidget('window', {
+        width: 500,
+        height: 300,
+        layout: {
+            type: 'border',
+            padding: 5
+        },
+        title: '您好对话框',
+        items: [{
+            title: '导航',
+            collapsible: true,
+            region: 'west',
+            width: 200,
+            html: 'Hello',
+            split: true
+        }, {
+            title: 'TabPanel',
+            region: 'center'
+        }]
+    });
+
+    window.show();
+})

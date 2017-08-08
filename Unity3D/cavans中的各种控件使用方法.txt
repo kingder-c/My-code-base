@@ -1,0 +1,188 @@
+1、Canvas
+
+    Render Mode 
+        Screen Space - Overlay
+            这种渲染模式下，在场景中UI元素被渲染在屏幕上。如果屏幕大小改变或更改了分辨率，画布上将自动更改大小，以很好的相匹配。
+        Screen Spcae - Camera
+            这是类似于Screen Space - Overlay，但在这个渲染模式下，画布被放置在指定的Camera前的一个给定的距离上。通过这个指定的摄像机UI元素被呈现出来，这意味着Camera settings会影响到UI的显示。如果将相机设置为Perspective，UI元素将在perspective下被呈现，perspective失真数可以被控制通过设置观看的Camera Field大小。如果屏幕调整的大小或更改分辨率或相机锥范围变化，画布上将自动更改大小，以及相匹配。
+        World Space
+            此渲染模式下使画布在场景中表现任何其他对象。可以手动使用其Rect Transform来设置画布的大小，和UI元素将会呈现在其他对象的前面或后面在基于 3D 配置的场景中。这是对于所有Ui是有用的，他们是world space的一部分，有时也被引用为剧情接口。
+2 button绑定事件
+
+    4种方法
+    方式一：继承基础接口实现
+        步骤一：创建ClickObject脚本。继承MonoBehaviour和IPointerClickHandler。
+        步骤二：实现public void OnPointerClick(PointerEventData eventData)方法：
+        步骤三：创建一个名为Panel_IPointer的空对象。并且将ClickObject脚本附加到对象上。
+        步骤四：启动，并点击Panel_IPointer对象。
+    方式二：Unity3D编辑器操作设置实现
+        步骤一：创建一个C#脚本。在脚本中添加一个public方法。
+        步骤二：创建一个命名为Empty的UI对象，用于接收和响应点击事件。创建一个名为Panel的UI对象，用于触发点击事件。
+        步骤三：Panel对象添加EventTrigger组件，" Add New" -> 选择" PointerClick"。将Empty对象拖拽到触发者位置。然后点击"No Function"选择我们写在Test脚本中的OnTestClick事件。
+        步骤四：设置好这些之后。我们的事件触发就已经完成了。运行Unity3D。点击窗口中Panel对象。
+    方式三：程序动态设置实现
+          using System.Collections.Generic;
+          using UnityEngine;
+          using UnityEngine.Events;
+          using UnityEngine.EventSystems;
+
+          public class ScriptControl : MonoBehaviour {
+
+              // Use this for initialization
+              void Start ()
+             {
+                 var trigger = transform.gameObject.GetComponent<EventTrigger>();
+                 if (trigger == null)
+                     trigger = transform.gameObject.AddComponent<EventTrigger>();
+
+                 // 实例化delegates
+                 trigger.delegates = new List<EventTrigger.Entry>();
+
+                 // 定义需要绑定的事件类型。并设置回调函数
+                 EventTrigger.Entry entry = new EventTrigger.Entry();
+                 // 设置 事件类型
+                 entry.eventID = EventTriggerType.PointerClick;
+                 // 设置回调函数
+                 entry.callback = new EventTrigger.TriggerEvent();
+                 UnityAction<BaseEventData> callback = new UnityAction<BaseEventData>(OnScriptControll);
+                 entry.callback.AddListener(callback);
+                 // 添加事件触发记录到GameObject的事件触发组件
+                 trigger.delegates.Add(entry);
+             }
+
+             // Update is called once per frame
+             void Update () {
+
+             }
+
+             public void OnScriptControll(BaseEventData arg0)
+             {
+                 Debug.Log("Test Click");
+             }
+
+         }
+    方式四：使用Button我们可以实现动态的变更鼠标绑定的点击事件
+          using UnityEngine;
+          using System.Collections;
+          using UnityEngine.UI;
+
+          public class BtnControl : MonoBehaviour {
+
+              // Use this for initialization
+              void Start ()
+              {
+                 var button = transform.gameObject.GetComponent<Button>();
+                 if (button != null)
+                 {
+                     button.onClick.RemoveAllListeners();
+                     button.onClick.AddListener(TestClick);
+                 }
+             }
+
+             public void TestClick()
+             {
+                 Debug.Log("Test Click. This is Type 4");
+             }
+
+             // Update is called once per frame
+             void Update () {
+
+             }
+         }
+3 text
+
+    实现语句不通颜色
+        支持code <color=#00ff00>zxxxczvc</color> 加在内容就可以
+        Text text = this.GetComponent<Text> ();
+        text.text = "<color=#ff0000>aa</color><color=#00ff00>bb</color><color=#0000ff>cc</color>";
+4 Image
+
+    获取Resources路径下的图片 ，作为sprite的路径
+        var image = this.gameObject.GetComponent<Image> ();
+        Texture2D texture = (Texture2D)Resources.Load("btUP" ,typeof(Texture2D));
+        if (texture == null) {
+            Debug.Log("sp is null");
+        }
+        Sprite sp = Sprite.Create (texture, new Rect(0,0,20,20),new Vector2(0.5f,0.5f));
+5 Toggle
+
+    绑定点击事件
+        void Start () {
+            mToggle = this.gameObject.GetComponent<Toggle> ();
+            if (mToggle != null) {
+                mToggle.onValueChanged.AddListener(ClickToggle);
+            }
+        }
+
+        public void ClickToggle(bool isOn){
+            Debug.Log (mToggle.name+ " is "+ isOn);
+        }
+    设置Toggle组
+        新建gameobject 并且添加 Toggle Group 组件
+        将gameobject拖到每个Toggle中的Group中，现在的Toggle为单选按钮
+        通常为新建Panel将Toggle拖到Panel作为子物体,将Panel拖到每个Toggle中的Group属性中
+6 Sclider
+
+    private Slider mSlider = null;
+    // Use this for initialization
+    void Start () {
+        mSlider = this.gameObject.GetComponent<Slider> ();
+        if (mSlider != null) {
+            mSlider.onValueChanged.AddListener(SlideTheSlider);
+        }
+    }
+
+    public void SlideTheSlider(float value){
+        Debug.Log (value);
+    }
+7 Droupdown
+
+        private Dropdown mDropdown = null;
+    // Use this for initialization
+        void Start () {
+            mDropdown = this.gameObject.GetComponent<Dropdown> ();
+
+            //新建每一项
+            Dropdown.OptionData optionData = new Dropdown.OptionData ();
+            optionData.text = "1";
+            Dropdown.OptionData optionData1 = new Dropdown.OptionData ();
+            optionData1.text = "2";
+            Dropdown.OptionData optionData2 = new Dropdown.OptionData ();
+            optionData2.text = "3";
+
+            将新建项添加到下拉菜单中
+            mDropdown.options.Add (optionData);
+            mDropdown.options.Add (optionData1);
+            mDropdown.options.Add (optionData2);
+
+            绑定回调
+            mDropdown.onValueChanged.AddListener (ClickDropdown);
+
+            下拉菜单的标题
+            mDropdown.captionText.text = "234";
+        }
+
+        private void ClickDropdown(int index){
+            Debug.Log (mDropdown.options[index].text);
+        }
+
+        //更换选项的时候输出选中项
+        Dropdown dw = GameObject.Find("Canvas/Dropdown").GetComponent<Dropdown>();
+        var type=dw.options[dw.value].text;
+        print(type);
+
+8 InputField 输入文本框
+
+9 Scroll View
+
+    新建 Scroll View 
+        包括ViewPort 以及 Content
+        ViewPort 主要包括 Mask （遮蔽）组件 以及 image组件
+        Content 可以新建 Panel 代替
+            新建Panel 添加 Grid Layout Group 组件 设置 Cell Size 属性与 Spacing 属性
+            在Panel 中添加 N 张image 
+        将 Panel 添加到Scroll View中的Content属性 将ViewPort 添加到Scroll View中的Viewport属性
+
+    代码动态添加子项
+        GameObject gameObject = Instantiate(Resources.Load<GameObject>("Prefabs/ScrollViewItem"),mScrollViewItemPostion,transform.rotation) as GameObject;
+        gameObject.transform.SetParent (this.gameObject.GetComponent<ScrollRect> ().content.transform);

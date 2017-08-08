@@ -1,0 +1,6 @@
+ArcGIS API For Javascript中queryTask查询返回结果限制为1000的解决办法
+标签： arcgisarcgis serverjavascript地图
+2014-05-16 12:24 2203人阅读 评论(1) 收藏 举报
+ 分类： GIS（10）  
+版权声明：本文为博主原创文章，未经博主允许不得转载。
+更改ArcGIS Server目录下的某个文件即可，地址格式参照：C:\Program Files (x86)\ArcGIS\Server10.0\server\user\cfg，里面可以找到自己发布的那个地图服务，把名字对应的.cfg文件用记事本打开，找到<MaxRecordCount>标签，把1000改成你想要的值即可，然后重启ArcGIS Server Object Manager 服务。这个配置文件里应该有很多可以改，自行研究。我这个是arcgis10.0版本，其他版本的大概都差不多。

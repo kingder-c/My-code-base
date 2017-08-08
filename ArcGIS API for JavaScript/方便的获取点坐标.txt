@@ -1,0 +1,7 @@
+    //获取点坐标
+    Robin.Map.Map2DControl.on( "click", mapClick );
+    function mapClick( e ) {
+        //获得用户点击的地图坐标
+        var point = e.mapPoint;
+        console.log( point );
+    }

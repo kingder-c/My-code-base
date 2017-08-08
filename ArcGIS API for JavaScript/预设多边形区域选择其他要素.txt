@@ -1,0 +1,80 @@
+Robin.Portal.Page.flyPumpStation = function (id, type, x, y, name) {
+
+    var map = Robin.Map.Map2DControl;
+    if (!Robin.Map.Map2DControl._layers[3].visible) {
+        Robin.Map.Map2DControl._layers[3].show();
+    }
+    Robin.Portal.Page.PumpStation.layer = Robin.Map.Map2DControl.getLayer("Robin.Portal.Page.PumpStation.layer");
+    if (Robin.Portal.Page.PumpStation.layer != undefined) {
+        Robin.Map.Map2DControl.removeLayer(Robin.Portal.Page.PumpStation.layer);
+    }
+    //地图工厂变更
+    Robin.Portal.Page.PumpStation.layer = Robin.Map.addLayer({ id: 'Robin.Portal.Page.PumpStation.layer' });
+    //地图工厂变更
+    var point = Robin.Map.Geometry.drawPoint(parseFloat(x), parseFloat(y), { wkid: Robin.Setting.GlobalSetting.wkid });
+    /*在地图上添加监测点*/
+    Robin.Map.ShowGraphic(Robin.Portal.Page.PumpStation.layer, '', x, y);
+
+    //泵站收水区域
+    var symbol = new esri.symbol.SimpleFillSymbol(
+                    esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                    new esri.symbol.SimpleLineSymbol(
+                        esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                        new dojo.Color([255, 0, 0]), 2),
+                    new dojo.Color([255, 255, 0, 0.25])
+                );
+    var polygonGeo = new esri.geometry.Polygon(new esri.SpatialReference({ wkid: Robin.Setting.GlobalSetting.wkid }));
+    polygonGeo.addRing([[513815.3977596099, 4144481.2188385543], [514380.54775960993, 4144489.685505221],
+        [515247.3227596099, 4144501.3271718877], [516105.13906220597, 4144507.671586119], [516128.8966014856, 4143454.5111797484],
+        [516138.1932606032, 4142143.041134158], [516136.8174510744, 4141085.3178857826], [515633.0507844077, 4141131.884552449],
+        [514900.68411774106, 4141182.6845524493], [514125.98411774105, 4141237.7178857825], [513830.1115836203, 4141244.629597949],
+        [513792.01158362033, 4142154.7962646154], [513785.4151394994, 4143340.5036424585], [513764.2484728328, 4144434.8203091253],
+        [513787.5318061661, 4144458.103642459], [513815.3977596099, 4144481.2188385543]]);
+    //polygonGeo.addRing([[514271.51666666666, 4143510.2083333335], [514396.4, 4143440.3583333334], [514478.95, 4143239.275], [514203.7833333333, 4143258.325], [514271.51666666666, 4143510.2083333335]]);
+    var graphic = new esri.Graphic(polygonGeo, symbol);
+    map.graphics.add(graphic);
+
+    //var polygonGeoDraw;
+    //Robin.ToolBar.toolbar = new esri.toolbars.Draw(Robin.Map.Map2DControl);
+    //Robin.ToolBar.toolbar.activate(esri.toolbars.Draw.POLYGON);//esri.toolbars.Draw.EXTENT);
+    //Robin.ToolBar.toolbar.on("draw-end", function (evt) {
+    //    Robin.ToolBar.toolbar.deactivate();
+    //    //框选查询结果
+    //    polygonGeoDraw = evt.geometry;
+    //    var graphicDraw = new esri.Graphic(polygonGeoDraw, symbol);
+    //    map.graphics.add(graphicDraw);        
+    //});
+
+    //定位到泵站点
+    Robin.Map.Fly2Geometry(map, polygonGeo);//map.setExtent(polygonGeo);
+    Robin.Portal.Page.PumpStation.show(id, parseFloat(x), parseFloat(y));
+
+    //查询此区域下的图层
+    var layerNames = [];
+    var identify, identifyParams;
+
+    identify = new esri.tasks.IdentifyTask(Robin.Setting.ArcGISMapServices[1].url);
+    identifyParams = new esri.tasks.IdentifyParameters();
+    identifyParams.geometry = polygonGeo;
+    identifyParams.mapExtent = Robin.Map.Map2DControl.extent;
+    identifyParams.width = Robin.Map.Map2DControl.width;
+    identifyParams.height = Robin.Map.Map2DControl.height;
+    identifyParams.returnGeometry = true;
+    //   identifyParams.layerIds = [15, 16];
+    identifyParams.tolerance = 3;//容差=3
+    identifyParams.spatialReference = new esri.SpatialReference({ wkid: Robin.Setting.GlobalSetting.wkid });//设置空间参考
+    identifyParams.layerOption = esri.tasks.IdentifyParameters.LAYER_OPTION_ALL;//设置查询的图层为全部图层
+    //查询结果大于1000条异常。
+    identify.execute(identifyParams, function (result) {
+        var result11 = result;
+        $.each(result, function (ii, vv) {
+            var polylineSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 51]), 4);
+            //先判断结果是不是折线
+            if (vv.feature.geometry.type == "polyline") {
+                var graphicvv = new esri.Graphic(vv.feature.geometry, polylineSymbol);
+                Robin.Map.Map2DControl.graphics.add(graphicvv);
+            }
+        });
+    },
+    function (err) { alert("err");});
+};

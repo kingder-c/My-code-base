@@ -1,0 +1,194 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<style>
+    body,html,#map {
+        height:100%;
+        width:100%;
+    }
+    #add {
+        position:fixed;
+        top:20px;
+        right:20px;
+    }
+    #num {
+        position:fixed;
+        top:60px;
+        right:20px;
+    }
+</style>
+<link href="" rel="stylesheet" />
+<div id="map" class="map"></div>
+<input type="button" value="add" id="add"/>
+<input type="text" id="num" value="100">
+<script>
+    var map;
+    require([
+        "esri/map",
+        "esri/request",
+         "esri/geometry/Polygon",
+         "esri/geometry/Polyline",
+         "esri/layers/GraphicsLayer",
+         "esri/symbols/SimpleFillSymbol",
+         "esri/symbols/SimpleLineSymbol",
+         "esri/Color",
+         "esri/symbols/TextSymbol",
+         "esri/SpatialReference",
+         "esri/graphic",
+        "dojo/domReady!"
+    ], function (Map, request, Polygon, Polyline, GraphicsLayer, SimpleFillSymbol, SimpleLineSymbol, Color, TextSymbol, SpatialReference, Graphic) {
+        map = new Map("map", {
+            basemap: "topo",
+            center: [0, 0],
+            zoom: 2
+        });
+        var graphicslayers = new GraphicsLayer();
+        //var data = createRandom(5);
+        
+        var contour = [10, 20, 30, 40, 50, 60, 70, 80];
+        $("#add").on("click", function () {
+            $("#legendBoard").remove();
+            graphicslayers.clear();
+
+            var num = $("#num").val();
+            var data = createRandom(20);
+            getContourLines(request, {
+                url: "/Home/getContourLine",
+                minLon: 115.23,
+                maxLon: 117.23,
+                minLat: 38.54,
+                maxLat: 40.54,
+                sizeX: num,
+                sizeY: num,
+                contour: contour,
+                station: data
+            }, function (res, context) {
+                var result = eval(res);
+                var features = null;
+                var unitX = 2 / num;
+                var unitY = 2 / num;
+                var colors = setColor(context.contour);
+                for (var i = 0; i < result.length; i++) {                 
+                    var line = result[i].OutLine.PointList,
+                        type = line.Type,
+                        value = result[i].HighValue;
+                    var coordinates = [];
+
+                    for (var j = 0; j < line.length; j++) {
+                        coordinates.push([line[j].Y * unitY + context.minLon, line[j].X * unitX + context.minLat]);
+                    }
+                    
+                    var symbol = new SimpleFillSymbol();
+                    symbol.setColor(getColor(value, colors));
+                    symbol.outline.setColor(getColor(value, colors));
+                        var polygon = new Polygon(coordinates);
+                        var graphic = new Graphic(polygon, symbol);
+                        graphicslayers.add(graphic);
+                }
+                addLegend(colors);
+                map.addLayer(graphicslayers);
+            })
+        })
+
+
+    })
+
+    function createRandom(num) {
+        var result = [];
+        for (var i = 0; i < num; i++) {
+            result.push([Math.random() * 2 + 115.23, Math.random() * 2 + 38.54, (Math.random() * 70 + 10).toFixed(2)]);
+        }
+
+        return result;
+    }
+
+        
+
+        function getContourLines(request, context, callback) {
+            if (!request) return;
+            if (!context.url) return;
+            if (!context.minLon || !context.maxLon || !context.minLat || !context.maxLat || !context.station) return;
+
+            context.sizeX = context.sizeX || 100;
+            context.sizeY = context.sizeY || 100;
+            if (!context.contour) {
+                var max = context.station[0][2];
+                var min = context.station[0][2];
+                for (var i = 0; i < context.station.length; i++) {
+                    if (context.station[i][2] >= max) max = context.station[i][2];
+                    if (context.station[i][2] <= min) min = context.station[i][2];
+                }
+
+                var len = ((max - min) / 3).toFixed(2);
+                context.contour = new Array();
+                context.contour.push((+len + (+min)).toFixed(2), (2 * (+len) + (+min)).toFixed(2));
+            }
+            if (!context.clip) {
+                context.clip = []
+            }
+            var dataRequest = request({
+                url: context.url,
+                content: {
+                    "minLon": context.minLon,
+                    "maxLon": context.maxLon,
+                    "minLat": context.minLat,
+                    "maxLat": context.maxLat,
+                    "sizeX": context.sizeX,
+                    "sizeY": context.sizeY,
+                    "contour": context.contour.join(","),
+                    "station": context.station.join(","),
+                    "clip":context.clip.join(",")
+                }
+            });
+            dataRequest.then(function (res) {
+                callback(res, context);
+            }, function (err) { })
+        }
+        function setColor(values) {
+            values = values.sort();
+            //var temp = [Math.floor(121 / (values.length )), Math.floor(150 / (values.length )),Math.floor(150 / (values.length ))];
+            // startColor [140,192,251]
+            // endColor [3,40,82]
+            var result = [];
+            var startColor = [55, 249, 28];
+            var endColor = [23, 0, 236];
+            var tempR = Math.floor((endColor[0] - startColor[0]) / (values.length - 1));
+            var tempG = Math.floor((endColor[1] - startColor[1]) / (values.length - 1));
+            var tempB = Math.floor((endColor[2] - startColor[2]) / (values.length - 1));
+            for (var i = 0; i < values.length; i++) {
+                result.push({
+                    value: values[i],
+                    color: [startColor[0] + i * tempR, startColor[1] + i * tempG, startColor[2] + i * tempB, 0.5]
+                    //color: [128 + i * temp[0], 9 + i * temp[1], 9 + temp[2]]
+                })
+            }
+
+            return result;
+        }
+        function getColor(value, colors) {
+            for (var i = 0; i < colors.length; i++) {
+                if (value == colors[i].value) { return colors[i].color };
+            }
+            return [0, 0, 0];
+        }
+        
+        function addLegend(colors) {
+            var div = document.createElement("div");
+            div.style = "position:fixed;top:50%;right:20px;background:white;font-size:22px;font-weight:bold;text-align:center;";
+            div.id = "legendBoard";
+            div.textContent = "图例";
+            var ul = document.createElement("ul");
+            ul.style = "list-style:none;padding:0;"
+            for (var i = 0; i < colors.length; i++) {
+                var li = document.createElement("li");
+                li.style = "font-size:12px;color:white;margin-bottom:6px;text-align:center;display:block;width:100px;background:" + "rgb(" + colors[i].color[0] + "," + colors[i].color[1] + "," + colors[i].color[2] + ");";
+                li.textContent = colors[i].value;
+                ul.appendChild(li);
+            }
+            div.appendChild(ul);
+            document.body.appendChild(div);
+        }
+
+
+    //}
+</script>

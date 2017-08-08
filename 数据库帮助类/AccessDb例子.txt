@@ -1,0 +1,19 @@
+　　使用例子：
+
+using AccessDb; 
+... 
+//初始化，载入数据库路径 
+AccessDbClass mydb = new AccessDbClass("c:/db.mdb"); 
+
+//返回符合SQL要求的DataTable，并且与控件dataGridView1绑定 
+DataTable dt = new DataTable(); 
+dt = mydb.SelectToDataTable(@"select * from student"); 
+this.dataGridView1.DataSource = dt; 
+
+//返回DataSet，其中包括一个符合SQL要求和给定名称的DataTable，并且与控件dataGridView1绑定 
+DataSet ds = new DataSet(); 
+ds = mydb.SelectToDataSet(@"select * from student","student"); 
+this.dataGridView1.DataSource = ds.Tables["student"]; 
+
+//关闭数据库 
+mydb.Close();

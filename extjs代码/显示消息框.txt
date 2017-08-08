@@ -1,0 +1,21 @@
+Ext.Msg.show({
+         title:'Hello',
+         msg:'Have you seen my heart?',
+         buttons:{
+                      yes:'true',
+                      no:true,
+                     cancel:true,
+                    }
+
+                     });
+					 
+					 
+//显示确认消息框并处理确认事件
+alertbox.confirm('友情提示', '您提供的三维服务器IP暂时无法访问，确定要修改？', function (btn) {
+                                                if (btn == 'yes') {
+													
+												}
+												else{
+													
+												}
+												

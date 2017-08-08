@@ -1,0 +1,35 @@
+//第一种定义方式
+var person=new Object(); //创建了一个对象.
+person.name="tom"; //使用person对象对调用name属性，它的值为tom
+alert(person.name); //显示name属性值
+person.say=function(){ //对person对象添加了一个say函数。
+alert("person say");
+};
+person.say();
+
+
+//第二种定义方式
+var person={
+name:"tom",
+say:function(){
+alert("hello person");
+}
+}; //创建了一个对象.
+//alert(person.name);
+//person.say();
+person.age=10;
+alert(person.age);
+//js中定义类是使用function。
+
+
+
+
+//有参数的类的构造方法
+var Person = function(name){ //我们在定义一个类。 相当于它具有一个有参数的构造函数。
+this.name =name;//类的属性
+this.say = function(){ //类的方法.
+alert("say good");
+}
+}
+var p = new Person("fox"); //定义Person类的一个对象p
+alert(p.name); //调用name属性

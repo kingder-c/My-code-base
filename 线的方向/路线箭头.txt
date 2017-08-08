@@ -1,0 +1,42 @@
+    //救援、撤离路线
+    arrowRoute: function (xStr, yStr, xEnd, yEnd, barrierPathArray, config, callback) {
+        var wkid = Robin.Setting.GlobalSetting.wkid;
+        require(["esri/geometry/Polyline", "js/DirectionalLineSymbol", "esri/symbols/PictureMarkerSymbol"],
+            function (Polygon, DirectionalLineSymbol, PictureMarkerSymbol) {
+                var graphicsLayer = Robin.Map.GetGraphicLayer(Robin.Map.Map2DControl, config.graphicLayerName);
+
+                Emergency.Map.Route.routePlan(xStr, yStr, xEnd, yEnd, barrierPathArray, false, function (solveResult) {
+                    var routeResults = solveResult.routeResults[0].route.geometry.paths;
+                    var resultRoute = routeResults[0];
+                    resultRoute.unshift([xStr, yStr]);
+                    resultRoute.push([xEnd, yEnd]);
+
+                    var picSymbol = new esri.symbol.PictureMarkerSymbol();
+                    picSymbol.setUrl(config.pic);
+                    picSymbol.setHeight(16);
+                    picSymbol.setWidth(16);
+
+                    var colorHex = Emergency.Map.Route.colorHexToRGB(config.color);
+                    var basicOptions = {
+                        style: esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                        color: new dojo.Color(colorHex),
+                        width: 2,
+                        directionSymbol: picSymbol,
+                        directionPixelBuffer: 30
+                    };
+
+                    var basicPolyline = new esri.geometry.Polyline(resultRoute);
+                    basicPolyline.setSpatialReference(new esri.SpatialReference({ wkid: wkid }));
+
+                    var basicSymbol = new DirectionalLineSymbol(basicOptions);
+
+                    var routeGraphic = new esri.Graphic(basicPolyline, basicSymbol, null, null);
+                    graphicsLayer.add(routeGraphic);
+
+                    if (callback) {
+                        callback(solveResult);
+                    }
+                });
+
+            });
+    },

@@ -1,0 +1,40 @@
+1、创建表空间。在sql窗口中输入
+	create tablespace test datafile 'D:\test.ora' size 1000m;
+这里的test为表空间名称，路径自己来命名。然后点执行按钮。
+
+2、执行成功后，继续创建用户。输入
+	create user test identified by test default tablespace test quota 500m on users; 
+ 这里第一个test为用户名，第二个test为密码，第三个test为表空间名。然后执行。
+
+3、成功创建用户后，进行授权。输入
+	grant all privileges to test; 
+执行该语句给test用户授权，此时test用户就可以登录了。
+
+4、测试环境下学习Oracle的时候，不需要经常修改密码，因此可以关闭密码验证，从而回避Oracle密码过期的问题。这个可以通过profile来实现。
+输入：ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME UNLIMITED;
+
+5、删除表空间
+
+DROP TABLESPACE 表空间名称 INCLUDING CONTENTS AND DATAFILES;
+
+6、授权
+
+grant connect to 用户名;
+grant exp_full_database to 用户名;
+grant imp_full_database to 用户名;
+grant resource to 用户名;
+grant create procedure to 用户名;
+grant create trigger to 用户名;
+grant execute any procedure to 用户名;
+grant grant any privilege to 用户名;
+grant restricted session to 用户名;
+grant select any table to 用户名;
+grant unlimited tablespace to 用户名;
+grant create any view to 用户名;
+grant select any dictionary to 用户名;
+
+7、查询用户名与表空间
+select username,default_tablespace from user_users;
+
+8、查询所有表空间
+select tablespace_name from dba_tablespaces;

@@ -1,0 +1,136 @@
+ showPond: function (stationKey,range) {
+        /*
+        1. 弹窗  填写范围大小
+        2. 计算 跟踪
+        3. 绘制
+        */
+        this.pondKey = stationKey;
+        // 显示弹窗  选择范围大小
+        // 根据积水点点位和范围大小进行流向分析
+        // Todo...
+        
+
+        //Robin.Portal.Page.WaterPoint.data = null;
+        //$.each(Robin.Data.waterLinkPumpSite, function (i, item) {
+        //    if (item.JSDModel.BMID == stationKey) {
+        //        Robin.Portal.Page.WaterPoint.data = item;
+        //    }
+        //});
+
+
+        /ar title = "选择范围";
+        //if (Robin.Window.GetInfoPanelByID("waterRangePickerPanel")) Robin.Window.GetInfoPanelByID("waterRangePickerPanel").close();
+        /ar url = '../WaterLogging/plugin/rangePicker.htm';
+        //Robin.Window.InfoPanel(title, '<iframe src="' +
+        //              url + '" width="100%" height="100%" frameborder="0" z-index="5"></iframe>',
+        //              { id: 'waterRangePickerPanel', contentSize: { width: 200, height: 100 }, theme: "primary", controls: { iconfont: 'font-awesome' }, minimizeOthers: false });
+        if (stationKey == "") {
+            var layer = Robin.Map.Map2DControl.getLayer("pond");
+            if (layer) Robin.Map.Map2DControl.removeLayer(layer);
+        } 
+        $.each(Robin.Data.monitor, function (j, v) {
+            if (Robin.Portal.Page.WaterPoint.pondKey == v.BMID) {
+                var p = Robin.Map.GetPoint(v.BMX, v.BMY);
+                Robin.Map.Fly2Geometry(Robin.Map.Map2DControl, p);
+                var pond = [v.BMX, v.BMY];
+
+                NProgress.start();
+                $.each(Robin.Setting.ArcGISMapServices, function (i, item) {
+                    var count = 0;
+                    if (item.url == '') {
+                        count++;
+                        return true;
+                    }
+
+
+
+                    require([
+                        "esri/map",
+                        "esri/geometry/Point",
+                        "esri/geometry/Polyline",
+                        "esri/layers/GraphicsLayer",
+                        "esri/symbols/SimpleMarkerSymbol",
+                        "esri/symbols/SimpleLineSymbol",
+                        "esri/symbols/SimpleFillSymbol",
+                        "esri/symbols/PictureMarkerSymbol",
+                        "esri/tasks/IdentifyTask",
+                        "esri/tasks/IdentifyParameters",
+                        "esri/geometry/Extent",
+                        "esri/SpatialReference",
+                        "esri/Color",
+                        "esri/graphic"
+                    ], function (map, Point, Polyline, GraphicsLayer, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Extent, SpatialReference, Color, Graphic) {
+                        var QueryExtend = new Extent(pond[0] - range, pond[1] - range, pond[0] + range, pond[1] + range,
+                            new SpatialReference({ wkid: 2384 }));
+                        identify = new IdentifyTask(item.url);
+                        identifyParams = new IdentifyParameters();
+                        identifyParams.geometry = QueryExtend;
+                        identifyParams.mapExtent = Robin.Map.Map2DControl.extent;
+                        identifyParams.width = Robin.Map.Map2DControl.width;
+                        identifyParams.height = Robin.Map.Map2DControl.height;
+                        identifyParams.returnGeometry = true;
+                        identifyParams.layerIds = [18, 19, 20, 21];
+                        identifyParams.tolerance = 3;
+                        identifyParams.spatialReference = new SpatialReference({ wkid: Robin.Setting.GlobalSetting.wkid });
+                        identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
+                        identify.execute(identifyParams, function (result) {
+                            var pointsData = [];
+                            var linesData = [];
+                            for (var i = 0; i < result.length; i++) {
+                                if (result[i].layerName == "WSPOINT" || result[i].layerName == "YSPOINT") {
+                                    pointsData.push(result[i]);
+                                }
+                                if (result[i].layerName == "WSLINE" || result[i].layerName == "YSLINE") {
+                                    linesData.push(result[i]);
+                                }
+                            }
+
+                            if (pointsData.length != 0) {
+                                var min = calcDistance(pointsData[0].feature.geometry.x, pointsData[0].feature.geometry.y, pond[0], pond[1])
+                                var minPointIndex = 0;
+                                for (var i = 0; i < pointsData.length; i++) {
+                                    var calc = calcDistance(pointsData[i].feature.geometry.x, pointsData[i].feature.geometry.y, pond[0], pond[1])
+                                    if (min >= calc) {
+                                        min = calc;
+                                        minPointIndex = i;
+                                    }
+                                }
+
+                                var graphicslayers = Robin.Map.addLayer({ id: "pond" })
+                                var points = [];
+                                var start_point = pointsData[minPointIndex];
+                                var allPoints = {};
+                                points.push(new Point(pond[0], pond[1]))
+                                points.push(start_point.feature.geometry.setSpatialReference(new SpatialReference({ wkid: Robin.Setting.GlobalSetting.wkid })));
+                                var lastPoint = start_point;
+                                while (lastPoint) {
+                                    lastPoint = findNext(lastPoint.feature.attributes.EXP_NO, linesData, pointsData, allPoints);
+                                    if (lastPoint) {
+                                        points.push(lastPoint.feature.geometry.setSpatialReference(new SpatialReference({ wkid: Robin.Setting.GlobalSetting.wkid })));
+                                        var symbol = new PictureMarkerSymbol("../images/waterlogging/arrow-right.png", 16, 16);
+                                        var angle = calcAngle(points[points.length - 2].x, points[points.length - 2].y, lastPoint.feature.geometry.x, lastPoint.feature.geometry.y)
+                                        symbol.setAngle(angle);
+                                        var graphi = new Graphic(points[points.length - 2], symbol);
+                                        graphicslayers.add(graphi);
+                                    }
+                                }
+
+                                var line = new Polyline();
+                                line.addPath(points);
+                                var symbol3 = new SimpleLineSymbol().setColor("#1EAAF4").setWidth(5);
+                                var grap = new Graphic(line, symbol3);
+                                graphicslayers.add(grap);
+                                Robin.Map.Map2DControl.addLayer(graphicslayers);
+                            }
+                        });
+                        NProgress.done();
+                    }, function (err) {
+                        alert(err);
+                        /*关闭Loading*/
+                        NProgress.done();
+                    });
+                });
+            }
+        })
+
+    }

@@ -1,0 +1,359 @@
+这个是我网上找的,觉得不错的一个DBHelper类,下面是作者话:
+
+//微软的企业库中有一个非常不错的数据操作类了.但是,不少公司(起码我遇到的几个...),对一些"封装"了些什么的东西不太敢用,虽然我推荐过微软的企业库框架了...但是还是要"评估"...一评就是几个月...而且,一些公司有的根本就是裸ado.net开发,或者自己封装的数据库操作类非常别扭,很不好用.
+//这里我给大家共享一个我参照企业库中的数据操作组件编码风格写的数据库操作类,对使用它的程序员来说,编码是很舒服滴(起码我觉得很好撒).以下是代码,很简单的,没有做任何多余的封装,只是改变了ADO.NET的编码步骤,方便了具体开发数据库操作代码的程序员.     
+    using System;
+    using System.Data;
+    using System.Data.Common;
+    using System.Configuration;
+namespace MyDBHelper
+{
+    public class DBHelper
+    {
+        private static string dbProviderName = ConfigurationManager.AppSettings["DbHelperProvider"];
+        private static string dbConnectionString = ConfigurationManager.AppSettings["DbHelperConnectionString"];
+
+        private DbConnection connection;
+        public DBHelper()
+        {
+            this.connection = CreateConnection(DBHelper.dbConnectionString);
+        }
+
+        public DBHelper(string connectionString)
+        {
+            this.connection = CreateConnection(connectionString);
+        }
+
+        public static DbConnection CreateConnection()
+        {
+            DbProviderFactory dbfactory = DbProviderFactories.GetFactory(DBHelper.dbProviderName);
+            DbConnection dbconn = dbfactory.CreateConnection();
+            dbconn.ConnectionString = DBHelper.dbConnectionString;
+            return dbconn;
+        }
+
+        public static DbConnection CreateConnection(string connectionString)
+        {
+            DbProviderFactory dbfactory = DbProviderFactories.GetFactory(DBHelper.dbProviderName);
+            DbConnection dbconn = dbfactory.CreateConnection();
+            dbconn.ConnectionString = connectionString;
+            return dbconn;
+        }
+
+        public DbCommand GetStoredProcCommond(string storedProcedure)
+        {
+            DbCommand dbCommand = connection.CreateCommand();
+            dbCommand.CommandText = storedProcedure;
+            dbCommand.CommandType = CommandType.StoredProcedure;
+            return dbCommand;
+        }
+        public DbCommand GetSqlStringCommond(string sqlQuery)
+        {
+            DbCommand dbCommand = connection.CreateCommand();
+            dbCommand.CommandText = sqlQuery;
+            dbCommand.CommandType = CommandType.Text;
+            return dbCommand;
+        }
+
+        //增加参数#region 增加参数
+        #region
+        public void AddParameterCollection(DbCommand cmd, DbParameterCollection dbParameterCollection)
+        {
+            foreach (DbParameter dbParameter in dbParameterCollection)
+            {
+                cmd.Parameters.Add(dbParameter);
+            }
+        }
+
+        public void AddOutParameter(DbCommand cmd, string parameterName, DbType dbType, int size)
+        {
+            DbParameter dbParameter = cmd.CreateParameter();
+            dbParameter.DbType = dbType;
+            dbParameter.ParameterName = parameterName;
+            dbParameter.Size = size;
+            dbParameter.Direction = ParameterDirection.Output;
+            cmd.Parameters.Add(dbParameter);
+        }
+
+        public void AddInParameter(DbCommand cmd, string parameterName, DbType dbType, object value)
+        {
+            DbParameter dbParameter = cmd.CreateParameter();
+            dbParameter.DbType = dbType;
+            dbParameter.ParameterName = parameterName;
+            dbParameter.Value = value;
+            dbParameter.Direction = ParameterDirection.Input;
+            cmd.Parameters.Add(dbParameter);
+        }
+
+        public void AddReturnParameter(DbCommand cmd, string parameterName, DbType dbType)
+        {
+            DbParameter dbParameter = cmd.CreateParameter();
+            dbParameter.DbType = dbType;
+            dbParameter.ParameterName = parameterName;
+            dbParameter.Direction = ParameterDirection.ReturnValue;
+            cmd.Parameters.Add(dbParameter);
+        }
+
+        public DbParameter GetParameter(DbCommand cmd, string parameterName)
+        {
+            return cmd.Parameters[parameterName];
+        }
+
+        #endregion
+
+        //执行#region 执行
+        #region
+
+        public DataSet ExecuteDataSet(DbCommand cmd)
+        {
+            DbProviderFactory dbfactory = DbProviderFactories.GetFactory(DBHelper.dbProviderName);
+            DbDataAdapter dbDataAdapter = dbfactory.CreateDataAdapter();
+            dbDataAdapter.SelectCommand = cmd;
+            DataSet ds = new DataSet();
+            dbDataAdapter.Fill(ds);
+            return ds;
+        }
+
+        public DataTable ExecuteDataTable(DbCommand cmd)
+        {
+            DbProviderFactory dbfactory = DbProviderFactories.GetFactory(DBHelper.dbProviderName);
+            DbDataAdapter dbDataAdapter = dbfactory.CreateDataAdapter();
+            dbDataAdapter.SelectCommand = cmd;
+            DataTable dataTable = new DataTable();
+            dbDataAdapter.Fill(dataTable);
+            return dataTable;
+        }
+
+        public DbDataReader ExecuteReader(DbCommand cmd)
+        {
+            cmd.Connection.Open();
+            DbDataReader reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            return reader;
+        }
+
+        public int ExecuteNonQuery(DbCommand cmd)
+        {
+            cmd.Connection.Open();
+            int ret = cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+            return ret;
+        }
+
+        public object ExecuteScalar(DbCommand cmd)
+        {
+            cmd.Connection.Open();
+            object ret = cmd.ExecuteScalar();
+            cmd.Connection.Close();
+            return ret;
+        }
+
+        #endregion
+
+        //执行事务#region 执行事务
+        #region
+        public DataSet ExecuteDataSet(DbCommand cmd, Trans t)
+        {
+            cmd.Connection = t.DbConnection;
+            cmd.Transaction = t.DbTrans;
+            DbProviderFactory dbfactory = DbProviderFactories.GetFactory(DBHelper.dbProviderName);
+            DbDataAdapter dbDataAdapter = dbfactory.CreateDataAdapter();
+            dbDataAdapter.SelectCommand = cmd;
+            DataSet ds = new DataSet();
+            dbDataAdapter.Fill(ds);
+            return ds;
+        }
+
+        public DataTable ExecuteDataTable(DbCommand cmd, Trans t)
+        {
+            cmd.Connection = t.DbConnection;
+            cmd.Transaction = t.DbTrans;
+            DbProviderFactory dbfactory = DbProviderFactories.GetFactory(DBHelper.dbProviderName);
+            DbDataAdapter dbDataAdapter = dbfactory.CreateDataAdapter();
+            dbDataAdapter.SelectCommand = cmd;
+            DataTable dataTable = new DataTable();
+            dbDataAdapter.Fill(dataTable);
+            return dataTable;
+        }
+
+        public DbDataReader ExecuteReader(DbCommand cmd, Trans t)
+        {
+            cmd.Connection.Close();
+            cmd.Connection = t.DbConnection;
+            cmd.Transaction = t.DbTrans;
+            DbDataReader reader = cmd.ExecuteReader();
+            DataTable dt = new DataTable();
+            return reader;
+        }
+
+        public int ExecuteNonQuery(DbCommand cmd, Trans t)
+        {
+            cmd.Connection.Close();
+            cmd.Connection = t.DbConnection;
+            cmd.Transaction = t.DbTrans;
+            int ret = cmd.ExecuteNonQuery();
+            return ret;
+        }
+
+        public object ExecuteScalar(DbCommand cmd, Trans t)
+        {
+            cmd.Connection.Close();
+            cmd.Connection = t.DbConnection;
+            cmd.Transaction = t.DbTrans;
+            object ret = cmd.ExecuteScalar();
+            return ret;
+        }
+
+        #endregion
+    }
+
+    public class Trans : IDisposable
+    {
+        private DbConnection conn;
+        private DbTransaction dbTrans;
+        public DbConnection DbConnection
+        {
+            get { return this.conn; }
+        }
+        public DbTransaction DbTrans
+        {
+            get { return this.dbTrans; }
+        }
+
+        public Trans()
+        {
+            conn = DBHelper.CreateConnection();
+            conn.Open();
+            dbTrans = conn.BeginTransaction();
+        }
+        public Trans(string connectionString)
+        {
+            conn = DBHelper.CreateConnection(connectionString);
+            conn.Open();
+            dbTrans = conn.BeginTransaction();
+        }
+        public void Commit()
+        {
+            dbTrans.Commit();
+            this.Colse();
+        }
+
+        public void RollBack()
+        {
+            dbTrans.Rollback();
+            this.Colse();
+        }
+
+        public void Dispose()
+        {
+            this.Colse();
+        }
+
+        public void Colse()
+        {
+            if (conn.State == System.Data.ConnectionState.Open)
+            {
+                conn.Close();
+            }
+        }
+    }
+}
+//那么如何使用它呢?下面我给出一些基本的使用示例,基本能满足你大部分的数据库操作需要了.
+//1)直接执行sql语句
+
+//        DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetSqlStringCommond("insert t1 (id)values('haha')");
+//        db.ExecuteNonQuery(cmd);
+//2)执行存储过程
+
+//        DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetStoredProcCommond("t1_insert");
+//        db.AddInParameter(cmd, "@id", DbType.String, "heihei");
+//        db.ExecuteNonQuery(cmd);
+//3)返回DataSet
+
+//        DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetSqlStringCommond("select * from t1");
+//        DataSet ds = db.ExecuteDataSet(cmd);
+//4)返回DataTable
+
+
+//        DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetSqlStringCommond("t1_findall");
+//        DataTable dt = db.ExecuteDataTable(cmd);
+//5)输入参数/输出参数/返回值的使用(比较重要哦)
+
+//        DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetStoredProcCommond("t2_insert");
+//        db.AddInParameter(cmd, "@timeticks", DbType.Int64, DateTime.Now.Ticks);
+//        db.AddOutParameter(cmd, "@outString", DbType.String, 20);
+//        db.AddReturnParameter(cmd, "@returnValue", DbType.Int32);
+
+//        db.ExecuteNonQuery(cmd);
+
+//        string s = db.GetParameter(cmd, "@outString").Value as string;//out parameter
+//        int r = Convert.ToInt32(db.GetParameter(cmd, "@returnValue").Value);//return value
+
+//6)DataReader使用
+
+//      DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetStoredProcCommond("t2_insert");
+//        db.AddInParameter(cmd, "@timeticks", DbType.Int64, DateTime.Now.Ticks);
+//        db.AddOutParameter(cmd, "@outString", DbType.String, 20);
+//        db.AddReturnParameter(cmd, "@returnValue", DbType.Int32);
+
+//        using (DbDataReader reader = db.ExecuteReader(cmd))
+//        {
+//            dt.Load(reader);
+//        }        
+//        string s = db.GetParameter(cmd, "@outString").Value as string;//out parameter
+//        int r = Convert.ToInt32(db.GetParameter(cmd, "@returnValue").Value);//return value
+
+//7)事务的使用.(项目中需要将基本的数据库操作组合成一个完整的业务流时,代码级的事务是必不可少的哦)
+//    pubic void DoBusiness()
+//    {
+//        using (Trans t = new Trans())
+//        {
+//            try
+//            {
+//                D1(t);
+//                throw new Exception();//如果有异常,会回滚滴
+//                D2(t);
+//                t.Commit();
+//            }
+//            catch
+//            {
+//                t.RollBack();
+//            }
+//        }
+//    }
+
+//    public void D1(Trans t)
+//    {
+//        DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetStoredProcCommond("t2_insert");
+//        db.AddInParameter(cmd, "@timeticks", DbType.Int64, DateTime.Now.Ticks);
+//        db.AddOutParameter(cmd, "@outString", DbType.String, 20);
+//        db.AddReturnParameter(cmd, "@returnValue", DbType.Int32);
+
+//        if (t == null) db.ExecuteNonQuery(cmd);
+//        else db.ExecuteNonQuery(cmd,t);
+
+//        string s = db.GetParameter(cmd, "@outString").Value as string;//out parameter
+//        int r = Convert.ToInt32(db.GetParameter(cmd, "@returnValue").Value);//return value
+//    }
+
+//    public void D2(Trans t)
+//    {
+//        DbHelper db = new DbHelper();
+//        DbCommand cmd = db.GetSqlStringCommond("insert t1 (id)values('..')");        
+//        if (t == null) db.ExecuteNonQuery(cmd);
+//        else db.ExecuteNonQuery(cmd, t);
+//    }
+//以上我们好像没有指定数据库连接字符串,大家如果看下DbHelper的代码,就知道要使用它必须在config中配置两个参数,如下:
+//    <appSettings>
+//        <add key="DbHelperProvider" value="System.Data.SqlClient"/>
+//        <add key="DbHelperConnectionString" value="Data Source=(local);Initial Catalog=DbHelperTest;Persist Security Info=True;User ID=sa;Password=sa"/>
+//    </appSettings>其实,DbHelper需要的仅仅是两个字符串,你可以自己修改,作成加密什么的...
+
+//好了,就这样,DbHelper的代码是非常简单和透明的,只是在ado.net上做了一点小包装,改变了一下使用它的程序员的编码方式,去除掉一些比较"物理级"的编程概念,如connection的open和close之类的,使程序员更专注于业务逻辑代码的编写,少死掉点脑细胞,另外,统一了数据操作层的数据操作代码的风格和格式,维护起来很方便的
+

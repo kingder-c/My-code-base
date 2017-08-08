@@ -1,0 +1,130 @@
+Transform基本移动函数：
+
+1.指定方向移动：
+
+//移动速度 
+float TranslateSpeed = 10f;
+
+//Vector3.forward 表示“向前”
+transform.Translate(Vector3.forward *TranslateSpeed);
+2.全方向移动：
+
+复制代码
+//x轴移动速度移动速度 
+float xSpeed = -5f;
+
+//z轴移动速度移动速度 
+float  zSpeed = 10f;
+
+//向x轴移动xSpeed，同时想z轴移动zSpeed，y轴不动 
+transform.Translate(xSpeed,0,zSpeed);
+复制代码
+3.重置坐标：
+
+//x轴坐标 
+float xPostion = -5f;
+//z轴坐标 
+float zPostion = 10f;
+//直接将当前物体移动到x轴为xPostion，y轴为0，z轴为zPostion的三维空间位置。
+transform.position = Vector3(xPostion,0,zPostion);
+输入控制：
+
+1.输入指定按键：
+
+复制代码
+//按下键盘“上方向键”
+if(Input.GetKey ("up"))
+　　print("Up!");
+
+//按下键盘“W键”
+if(Input.GetKey(KeyCode.W);)
+　　print("W!");
+复制代码
+2.鼠标控制
+
+//按下鼠标左键（0对应左键 ， 1对应右键 ， 2对应中键） 
+if(Input.GetMouseButton(0))
+　　print("Mouse Down!");
+Input.GetAxis("Mouse X");//鼠标横向增量（横向移动） 
+Input.GetAxis("Mouse Y");//鼠标纵向增量（纵向移动）
+3.获取轴：
+
+//水平轴/垂直轴 (控制器和键盘输入时此值范围在-1到1之间)
+Input.GetAxis("Horizontal");//横向 
+Input.GetAxis ("Vertical");//纵向
+按住鼠标拖动物体旋转和自定义角度旋转物体：
+
+ 
+
+复制代码
+float speed = 100.0f;
+float x;
+float z;
+
+void Update () {
+　　if(Input.GetMouseButton(0)){//鼠标按着左键移动 
+　　　　y = Input.GetAxis("Mouse X") * Time.deltaTime * speed;               
+　　　　x = Input.GetAxis("Mouse Y") * Time.deltaTime * speed; 
+　　}else{
+　　　　x = y = 0 ;
+　　}
+　　
+　　//旋转角度（增加）
+　　transform.Rotate(new Vector3(x,y,0));
+　　/**---------------其它旋转方式----------------**/
+　　//transform.Rotate(Vector3.up *Time.deltaTime * speed);//绕Y轴 旋转 
+
+　　//用于平滑旋转至自定义目标 
+　　pinghuaxuanzhuan();
+｝
+
+
+//平滑旋转至自定义角度 
+
+void OnGUI(){
+　　if(GUI.Button(Rect(Screen.width - 110,10,100,50),"set Rotation")){
+　　　　//自定义角度
+
+　　　　targetRotation = Quaternion.Euler(45.0f,45.0f,45.0f);
+　　　　// 直接设置旋转角度 
+　　　　//transform.rotation = targetRotation;
+
+　　　　// 平滑旋转至目标角度 
+　　　　iszhuan = true;
+　　}
+}
+
+bool iszhuan= false;
+Quaternion targetRotation;
+
+void pinghuaxuanzhuan(){
+　　if(iszhuan){
+　　　　transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 3);
+　　}
+}
+复制代码
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+键盘控制物体缩放：
+
+复制代码
+float speed = 5.0f;
+float x;
+float z;
+
+void Update () {
+    x = Input.GetAxis("Horizontal") * Time.deltaTime * speed;    //水平           
+    z = Input.GetAxis("Vertical") * Time.deltaTime * speed;      //垂直//"Fire1"，"Fine2"，"Fine3"映射到Ctrl，Alt，Cmd键和鼠标的三键或腰杆按钮。新的输入轴可以在Input Manager中添加。
+    transform.localScale += new Vector3(x, 0, z);  
+    
+    /**---------------重新设置角度（一步到位）----------------**/
+    //transform.localScale = new Vector3(x, 0, z);
+}

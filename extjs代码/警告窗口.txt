@@ -1,0 +1,11 @@
+alertbox.show({
+            title: '提示',
+            msg: '请先关闭数据加载窗口再打开！',
+            buttons: Ext.Msg.OK,
+            buttonAlign: 'center',
+            icon: Ext.Msg.INFO
+        });
+		
+		
+		
+var alertbox = Ext.widget('messagebox', { shadow: false });//提示窗口对象

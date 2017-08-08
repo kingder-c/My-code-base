@@ -1,0 +1,11 @@
+//写在事件外边，防止被注销
+var iTime; 
+
+
+
+
+//写在事件内部
+   clearTimeout(iTime);
+    iTime = setTimeout(function () {
+        //需要执行的事件
+    }, 100);

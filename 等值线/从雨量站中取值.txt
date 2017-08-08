@@ -1,0 +1,13 @@
+ function () {
+
+        var result = [];
+        //所有监测点信息
+        $.each(Robin.Data.monitor, function (i, v) {
+
+            if (v.BMID.substring(6, 12) == "011197") {
+                result.push(v);
+            }
+        });
+
+        return result;
+    }

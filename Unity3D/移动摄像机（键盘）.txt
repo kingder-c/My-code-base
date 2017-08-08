@@ -1,0 +1,26 @@
+	void Update () {
+        #region ÒÆ¶¯ÉãÏñ»ú
+        float x = Input.GetAxis("Horizontal") * Time.deltaTime * spend;
+        float z = Input.GetAxis("Vertical") * Time.deltaTime * spend;
+        transform.Translate(x, 0, z);
+        if (Input.GetKey(KeyCode.F))
+        {
+            transform.Rotate(0, -spend * Time.deltaTime, 0, Space.Self);
+        }
+        if (Input.GetKey(KeyCode.H))
+        {
+            transform.Rotate(0, spend * Time.deltaTime, 0, Space.Self);
+
+        }
+        if (Input.GetKey(KeyCode.T))
+        {
+            transform.Rotate(-spend * Time.deltaTime, 0, 0, Space.Self);
+        }
+        if (Input.GetKey(KeyCode.G))
+        {
+            transform.Rotate(spend * Time.deltaTime, 0, 0, Space.Self);
+
+        }
+        #endregion
+
+    }

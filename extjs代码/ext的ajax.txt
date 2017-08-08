@@ -1,0 +1,71 @@
+ Ext.Ajax.request({
+                                url: 'NetCode/DataHandler.ashx',
+                                method: 'post',
+                                params: { httpParams: 'CheckIP', BaseIpUrl: baseIP },
+                                async: false,
+                                //成功时回调
+                                success: function (response, options) {
+                                    //获取响应的json字符串
+                                    var data = response.responseText;
+                                    var checkString = data;//??为什么多一步？
+                                    var errNum = 0;
+                                    if (baseIP != "") {/*只有三维服务器IP的时候*/
+                                        if (checkString == "False") {
+                                            alertbox.confirm('友情提示', '您提供的三维服务器IP暂时无法访问，确定要修改？', function (btn) {
+                                                if (btn == 'yes') {
+                                                    /*重写XML中的IP地址*/
+                                                    modifyIP = baseIP + ",1;";
+                                                    Ext.Ajax.request({
+                                                        url: 'NetCode/DataHandler.ashx',
+                                                        method: 'post',
+                                                        params: { httpParams: 'ModifyIpXml', ModifyIP: modifyIP },
+                                                        async: false,
+                                                        //成功时回调
+                                                        success: function (response, options) {
+                                                            var returnData = response.responseText;
+                                                            var returenInfo = returnData.split(";");
+                                                            for (var i = 0; i < returenInfo.length; i++) {
+                                                                if (returenInfo[i] == "False") {
+                                                                    alertbox.show({
+                                                                        title: '提示',
+                                                                        msg: '修改失败，请重新操作！',
+                                                                        buttons: Ext.Msg.OK,
+                                                                        buttonAlign: 'center',
+                                                                        icon: Ext.Msg.WARNING
+                                                                    });
+                                                                    return;
+                                                                }
+                                                            }
+                                                            ModifyIpAddress(baseIP);
+                                                            var extComp = Ext.getCmp("sysIpUrlWnd");
+                                                            if (extComp) {
+                                                                Ext.getCmp("sysIpUrlWnd").close();
+                                                            }
+                                                        }
+                                                    });
+                                                }//IP无法访问仍修改后的事件
+                                                else {
+                                                    return;
+                                                }//IP无法访问返回
+                                            });//确认弹框
+                                        }//IP无法访问处理方式
+                                        else {
+                                            ModifyIpAddress(baseIP);
+                                            var extComp = Ext.getCmp("sysIpUrlWnd");
+                                            if (extComp) {
+                                                Ext.getCmp("sysIpUrlWnd").close();
+                                            }
+                                        }//修改成功
+                                    }
+                                },//从服务器调用IP成功后的处理方式
+                                failure: function (resp, opts) {
+                                    var respText = Ext.util.JSON.decode(resp.responseText);
+                                    alertbox.show({
+                                        title: '提示',
+                                        msg: 'IP地址验证失败，请重新操作！<br\>错误消息：' + respText.error,
+                                        buttons: Ext.Msg.OK,
+                                        buttonAlign: 'center',
+                                        icon: Ext.Msg.WARNING
+                                    });
+                                }
+                            });

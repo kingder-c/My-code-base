@@ -1,0 +1,23 @@
+设置 CSS 属性
+设置所有匹配元素的指定 CSS 属性。
+$(selector).css(name,value)
+
+
+返回 CSS 属性值
+返回第一个匹配元素的 CSS 属性值。
+注释：当用于返回一个值时，不支持简写的 CSS 属性（比如 "background" 和 "border"）。
+$(selector).css(name)
+
+使用函数来设置 CSS 属性
+
+设置所有匹配的元素中样式属性的值。
+
+此函数返回要设置的属性值。接受两个参数，index 为元素在对象集合中的索引位置，value 是原先的属性值。
+
+$(selector).css(name,function(index,value))
+
+参数 	描述
+name 	必需。规定 CSS 属性的名称。该参数可包含任何 CSS 属性，比如 "color"。
+function(index,value) 	规定返回 CSS 属性新值的函数。
+index - 可选。接受选择器的 index 位置
+oldvalue - 可选。接受 CSS 属性的当前值。

@@ -1,0 +1,27 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<meta charset="utf-8"> 
+	<title>Bootstrap 弹出框实例</title> 
+	<meta name="description" content="This is an example to create Popover with Bootstrap.">
+	<link href="/try/bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css" rel="stylesheet"> 
+</head>
+<body>
+	
+<div class="container">
+	<h2>使用Bootstrap创建弹出框</h2>
+	<div class="well">
+		<a href="#" id="example" class="btn btn-success" rel="popover" data-content="为我的网站创建一个提示框如此简单！" data-original-title="Bootstrap弹出框">悬停弹出框</a>
+	</div>
+</div>
+<script src="http://cdn.static.runoob.com/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="/try/bootstrap/twitter-bootstrap-v2/js/bootstrap-tooltip.js"></script>
+<script src="/try/bootstrap/twitter-bootstrap-v2/js/bootstrap-popover.js"></script>
+<script>
+$(function (){ 
+	$("#example").popover();
+});
+</script>
+	
+</body>
+</html>

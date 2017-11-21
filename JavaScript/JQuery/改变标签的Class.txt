@@ -1,0 +1,36 @@
+class属性修改
+
+　　类属性即class属性,规定类名.
+　　用类选择器规定样式的时候,需要为元素指定类名,即class属性的值.
+　　注意每个HTML元素只有一个class属性.但是class属性的值可以是多个名称,即可能包含一个词的列表,中间用空格分隔.
+
+　　用jQuery进行类名修改既可以用attr()方法修改”class”属性,也可以用addClass(), removeClass(), toggleClass()等方法来完成.
+ 
+addClass()
+　　API: http://api.jquery.com/addClass/
+　　addClass()方法向匹配的元素增加指定的类名(一个或多个).
+　　注意对于元素来说,class属性可以有多个值.该方法不会移除已经存在的值,而是在原有的基础上追加一个或多个class属性. 
+　　用attr()方法设置class属性,是一个覆盖的过程;而addClass()则是一个追加的过程.
+　　class之间最终是用空格来隔开的.
+　　如果需要添加多个类,用空格分隔类名.
+　　从1.4开始,这个方法的参数也可以传入一个function.
+ 
+removeClass()
+　　API: http://api.jquery.com/removeClass/
+　　removeClass()方法从被选元素移除一个或多个类.如需移除若干类,用空格来分隔类名.
+　　如果没有传参数,该方法将会移除被选元素的所有类.
+ 
+ 
+toggleClass()
+　　API: http://api.jquery.com/toggleClass/
+　　toggleClass()方法对被选元素的一个或多个类进行切换(设置或移除).
+　　该方法检查每个元素中的指定类,如果存在则删除,如果不存在则添加.
+　　通过添加参数,可以设置只进行删除或者只进行添加操作.
+　　格式:$(selector).toggleClass(class,switch)
+　　switch值为true时,只添加;为false时,只删除.
+ 
+ 
+hasClass()
+　　API: http://api.jquery.com/hasClass/
+　　hasClass()方法检查被选元素是否包含指定的class.
+　　还可以用is()方法实现同样的功能,方法参数传入一个选择器字符串,比如”.className”.

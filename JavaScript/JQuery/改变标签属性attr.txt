@@ -1,0 +1,5 @@
+实例
+改变图像的 width 属性：
+$("button").click(function(){
+  $("img").attr("width","180");
+});

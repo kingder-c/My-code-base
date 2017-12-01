@@ -1,0 +1,47 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+  <title></title>
+  <style type="text/css">
+    /*div {
+      width: 2px;
+      height: 2px;
+      background-color: red;
+      position: absolute;
+    }*/
+  </style>
+  <script type="text/javascript">
+      var oDivs;
+      window.onload = function () {
+          oDivs = document.getElementById('magnifyingDIV');
+          //oDivs.style.height = "260px";
+          //oDivs.style.width = "260px";
+          //oDivs.style.backgroundColor = "red";
+          //oDivs.style.borderRadius = "130px";
+          //oDivs.style.border = "solid rgb(100,100,100) 1px";
+
+          //document.body.appendChild(oDivs);
+
+          //oDivs.style = "height:260px;width:260px;background-color:ActiveCaption;border-radius:130px;border:solid rgb(100,100,100) 1px;margin-left:-130px;margin-top:-130px;";
+          document.onmousemove = function (ev) {
+              var oEvent = ev || event;
+              //document.getElementsByTagName('span')[0].innerHTML = oEvent.clientY + '|' + oEvent.clientX;
+              //for (var i = oDivs.length - 1; i > 0; i--) {
+              //    oDivs[i].style.top = oDivs[i - 1].style.top;
+              //    oDivs[i].style.left = oDivs[i - 1].style.left;
+              //}
+              oDivs.style.top = oEvent.clientY + 'px';
+              oDivs.style.left = oEvent.clientX + 'px';
+              document.body.appendChild(oDivs);
+          };
+
+      };
+  </script>
+</head>
+<body>
+  <span></span>
+  
+  <div id="magnifyingDIV" style="height:260px;width:260px;background-color:ActiveCaption;border-radius:130px;border:solid rgb(100,100,100) 1px;margin-left:-130px;margin-top:-130px;position: absolute;"><div>d</div></div>
+ 
+</body>
+</html>

@@ -1,0 +1,8 @@
+function changeMaterial(model, materialA) {
+    for (var i = 0; i < model.children.length; i++) {
+        if (model.children[i].material)
+            model.children[i].material = materialA;
+        else
+            changeMaterial(model.children[i], materialA);
+    }
+}

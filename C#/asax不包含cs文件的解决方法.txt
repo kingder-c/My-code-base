@@ -1,0 +1,17 @@
+1. 
+WebSite 默认的 Global.asax 模板似乎是不生成 Global.asax.cs 的， 
+该模板使用内联代码方式（在 Global.asax 中） 
+
+你看到的应该是 WebApplication 的 
+
+2. 
+自己建一个模板（稍微复杂） 
+
+
+3. 
+自己在 App_Code 增加一个 Global.asax.cs， 
+
+
+Global.asax 中使用 
+
+<%@ Application Codebehind="App_Code\Global.asax.cs" Inherits="Global" Language="C#" %> 

@@ -1,0 +1,9 @@
+﻿导入json
+d:\Program Files\MongoDB\Server\3.2\bin>mongoimport --host 127.0.0.1 --port 27017 --db zyCoredb --collection ROBIN_HWSERVICE_FACILITY --file E:\wellCover.json --type json
+
+导出
+d:\Program Files\MongoDB\Server\3.2\bin>mongoexport --host 127.0.0.1 --port 27017 --db zyCoredb --collection ROBIN_HWSERVICE_FACILITY --out E:\test.json --type json
+
+
+
+

@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.22/dijit/themes/tundra/tundra.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.22/esri/css/esri.css">
+    <link href="Package/Bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="CSS/index.css" rel="stylesheet" />
+    <script src="https://js.arcgis.com/3.22/"></script>
+    <script src="Package/jquery-3.2.1.min.js"></script>
+    <script src="Package/Bootstrap/bootstrap.min.js"></script>
+
+    <style>
+        html, body, #map {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align:center">
+        <button type="button" id="myButton" data-loading-text="Loading..." class="btn btn-primary" autocomplete="off" onclick="ContourLine()">
+            生成降雨量等值线
+        </button>
+        <button type="button" id="myButton" data-loading-text="Loading..." class="btn btn-primary" autocomplete="off" onclick="ContourPlane()">
+            生成降雨量等值面
+        </button>
+        <button type="button" id="myButton" data-loading-text="Loading..." class="btn btn-primary" autocomplete="off" onclick="WaterContourLine()">
+            生成积水点等值线
+        </button>
+        <button type="button" id="myButton" data-loading-text="Loading..." class="btn btn-primary" autocomplete="off" onclick="WaterContourPlane()">
+            生成积水点等值面
+        </button>
+    </div>
+
+    <!--地图显示框-->
+    <div id="map"></div>
+
+    <div class="legendBoard" id="legendBoard">
+        <div class="legendBoard-title">
+            <span>降雨量值</span><span style="float:right;" class="legend-close">×</span>
+        </div>
+        <div class="legendBoard-content">
+            <div class="legendBoard-contour">
+                <ul id="legend-contour"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="Script/ContourPortal.js"></script>
+</body>
+</html>

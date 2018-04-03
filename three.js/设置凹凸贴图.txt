@@ -1,0 +1,10 @@
+        //∞ºÕπÃ˘Õº
+        var texture = THREE.ImageUtils.loadTexture("model/maxdae/images/1_wall.jpg");
+        //geom.computeVertexNormals();
+        var mat = new THREE.MeshPhongMaterial();
+        mat.map = texture;//…Ë÷√Ã˘Õº
+        if (bump) {
+            var bump = THREE.ImageUtils.loadTexture("model / maxdae / images / 20140519030228765.jpg");
+            mat.bumpMap = bump;//…Ë÷√∞ºÕπŒ∆¿Ì
+            mat.bumpScale =1;
+        }

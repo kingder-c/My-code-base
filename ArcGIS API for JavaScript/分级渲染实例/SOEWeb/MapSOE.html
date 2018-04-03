@@ -1,0 +1,567 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FeatureLayer</title>
+
+<!--<link rel="stylesheet" href="https://js.arcgis.com/3.17/esri/css/esri.css">-->
+<!--<script src="https://js.arcgis.com/3.17/"></script>-->
+<link rel="stylesheet" href="https://js.arcgis.com/3.22/dijit/themes/tundra/tundra.css">
+<link rel="stylesheet" href="https://js.arcgis.com/3.22/esri/css/esri.css">
+<script src="https://js.arcgis.com/3.22/"></script>
+<style>
+html, body, #map {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+</style>
+
+<script>
+    var StartPoint = "";
+    var EndPoint = "";
+    var app = {};
+    require([
+        "esri/map", "esri/geometry/Point", "esri/request",
+        "esri/layers/ArcGISDynamicMapServiceLayer",
+        "dojo/domReady!"
+    ],
+      function (
+        Map,Point,esriRequest,
+        ArcGISDynamicMapServiceLayer
+      ) {
+          
+          app.map = new Map("map");
+
+          var DynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://172.30.16.198:6080/arcgis/rest/services/SuZhouDem/MapServer");
+          var DynamicMapServiceLayer02 = new ArcGISDynamicMapServiceLayer("http://172.30.16.198:6080/arcgis/rest/services/WaterDepthPoint/MapServer");
+          var DynamicMapServiceLayer03 = new ArcGISDynamicMapServiceLayer("http://172.30.16.198:6080/arcgis/rest/services/rainfall/MapServer");
+
+          //app.map.addLayer(DynamicMapServiceLayer);
+          app.map.addLayer(DynamicMapServiceLayer02);
+          app.map.addLayer(DynamicMapServiceLayer03);
+
+          app.map.on("click", function (evt) {
+              if (StartPoint == "") {
+                  StartPoint = evt.mapPoint;
+              }
+              else {
+                  EndPoint = evt.mapPoint;
+              }
+          });
+
+
+
+          
+
+      });
+
+
+    //画多段线
+    function drawPolyline(response) {
+        require(["esri/map", "esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol", "esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer", "esri/config",
+        "dojo/domReady!"], function (esriRequest, Polyline, CartographicLineSymbol, Graphic, esriConfig) {
+            
+            app.map.graphics.clear();
+            if (response.state == "success") {
+                for(var i=0;i<response.ContourLine.length;i++)
+                {
+                    var line = new esri.geometry.Polyline(response.ContourLine[i].GeometryLine);
+                    var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]),2);
+                    var graphic = new esri.Graphic(line, symbol);
+                    app.map.graphics.add(graphic);
+                }
+            }
+            else {
+                alert(response.state);
+            }
+            
+
+            //for (var i = 0; i < response.paths.length; i++) {
+            //    var pathDuan = JSON.stringify(response.paths[i]);
+            //    var line = new esri.geometry.Polyline([[0.481600001,0.118299998],[12958938.7621,4854421.353299998],[12958944.332600001,4854234.986699998],[12958947.4584,4854184.595399998]]);
+
+            //    var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 0]), 2);
+            //    var graphic = new esri.Graphic(line, symbol);
+            //    map.graphics.add(graphic);
+            //}
+
+        });
+    }
+
+    //画多边形
+    function drawPolygon(response) {
+        require(["esri/map","esri/layers/GraphicsLayer","esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol", "esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer", "esri/config", "esri/symbols/SimpleFillSymbol", "esri/symbols/CartographicLineSymbol", "esri/symbols/SimpleLineSymbol", "esri/Color","esri/InfoTemplate","esri/symbols/FillSymbol",
+        "dojo/domReady!"], function (esriRequest, GraphicsLayer, Polyline, CartographicLineSymbol, Graphic, SimpleFillSymbol, CartographicLineSymbol, SimpleLineSymbol, Color, InfoTemplate, FillSymbol,esriConfig) {
+
+            app.map.graphics.clear();
+            if (response.state == "success") {
+                var pGraphicsLayer = new GraphicsLayer();
+
+                for (var i = 0; i < response.ContourPlane.length; i++) {
+                    var polygon = new esri.geometry.Polygon(response.ContourPlane[i].GeometryPolygon);
+                    var color = new esri.Color([0,0, 255]);
+                    var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 255]), 2);
+                    //var polySymbolRed = new SimpleFillSymbol(SimpleLineSymbol.STYLE_SOLID,
+                    //    symbol,
+                    //    color
+                    //    );
+
+                    var polySymbolRed = new FillSymbol();
+                    polySymbolRed.color = color;
+
+                    polySymbolRed.color = color;
+                                        
+                    var graphic = new esri.Graphic(polygon, polySymbolRed);
+
+                    
+                    var infoTemplate = new InfoTemplate();
+                
+
+
+                    graphic.attr("val","zjj_" + i);
+                    pGraphicsLayer.add(graphic);
+                    //app.map.graphics.add(graphic);
+                }
+                app.map.addLayer(pGraphicsLayer);
+            }
+            else {
+                alert(response.state);
+            }
+
+
+            //for (var i = 0; i < response.paths.length; i++) {
+            //    var pathDuan = JSON.stringify(response.paths[i]);
+            //    var line = new esri.geometry.Polyline([[0.481600001,0.118299998],[12958938.7621,4854421.353299998],[12958944.332600001,4854234.986699998],[12958947.4584,4854184.595399998]]);
+
+            //    var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 0]), 2);
+            //    var graphic = new esri.Graphic(line, symbol);
+            //    map.graphics.add(graphic);
+            //}
+
+        });
+    }
+
+    function drawWaterLine(response) {
+        require(["esri/map",
+            "esri/layers/GraphicsLayer",
+            "esri/geometry/Point",
+            "esri/request",
+            "esri/geometry/Polyline",
+            "esri/symbols/CartographicLineSymbol",
+            "esri/graphic",
+            "esri/layers/ArcGISDynamicMapServiceLayer",
+            "esri/config",
+            "esri/symbols/SimpleFillSymbol",
+            "esri/symbols/CartographicLineSymbol",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/Color",
+            "esri/InfoTemplate",
+            "dojo/domReady!"],
+            function (esriRequest, GraphicsLayer, Polyline, CartographicLineSymbol, Graphic, SimpleFillSymbol, CartographicLineSymbol, SimpleLineSymbol, Color, InfoTemplate, esriConfig) {
+
+            app.map.graphics.clear();
+            if (response.state == "success") {
+                var pGraphicsLayer = new GraphicsLayer();
+
+                for (var i = 0; i < response.WaterDepthContourLineArray.length; i++) {
+                    var polygon = new esri.geometry.Polygon(response.WaterDepthContourLineArray[i].WaterRange);
+                    var color = new esri.Color([255, 0, 0]);
+                    var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 2);
+                    var polySymbolRed = new SimpleFillSymbol(SimpleLineSymbol.STYLE_SOLID,
+                        symbol,
+                        color
+                        );
+                    polySymbolRed.color = color;
+                    var graphic = new esri.Graphic(polygon, polySymbolRed);
+
+                    //var attr = { "Xcoord": evt.mapPoint.x, "Ycoord": evt.mapPoint.y, "Plant": "Mesa Mint" };
+                    //var infoTemplate = new InfoTemplate();
+                    graphic.attr("val", "zjj_" + i);
+                    pGraphicsLayer.add(graphic);
+
+                    //实现等值线的添加
+                    for (var j = 0; j < response.WaterDepthContourLineArray[i].WaterContourLine.ContourLine.length; j++) {
+                        var line = new esri.geometry.Polyline(response.WaterDepthContourLineArray[i].WaterContourLine.ContourLine[j].GeometryLine);
+                        var symbolLine = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 255, 0]), 2);
+                        var graphicLine = new esri.Graphic(line, symbolLine);
+                        graphicLine.attr("contourValue", response.WaterDepthContourLineArray[i].WaterContourLine.ContourLine[j].Contour);
+                        pGraphicsLayer.add(graphicLine);
+                    }
+
+
+
+                    //app.map.graphics.add(graphic);
+                }
+                app.map.addLayer(pGraphicsLayer);
+            }
+            else {
+                alert(response.state);
+            }
+
+
+        });
+    }
+
+
+    function drawWaterPlane(response) {
+        require(["dojo/dom",
+            "dojo/_base/array",
+            "dojo/parser",
+            "dojo/query",
+            "dojo/on",
+            "esri/Color",
+            "esri/config",
+            "esri/map",
+            "esri/layers/GraphicsLayer",
+            "esri/graphic",
+            "esri/geometry/normalizeUtils",
+            "esri/tasks/GeometryService",
+            "esri/tasks/BufferParameters",
+            "esri/toolbars/draw",
+            "esri/symbols/SimpleMarkerSymbol",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/symbols/SimpleFillSymbol",
+
+            "dijit/layout/BorderContainer",
+            "dijit/layout/ContentPane",
+            "dijit/form/Button",
+             "dojo/domReady!"
+        ], function (dom, array, parser, query, on, Color, esriConfig, Map,GraphicsLayer,Graphic, normalizeUtils, GeometryService, BufferParameters, Draw, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol) {
+
+            app.map.graphics.clear();
+            if (response.state == "success") {
+                var pGraphicsLayer = new GraphicsLayer();
+
+
+                for (var i = 0; i < response.WaterDepthContourPlaneArray.length; i++) {
+                    for (var j = 0; j < response.WaterDepthContourPlaneArray[i].ContourPlane.length; j++) {
+                        var polygon = new esri.geometry.Polygon(response.WaterDepthContourPlaneArray[i].ContourPlane[j].GeometryPolygon);
+                        
+                        var color = new esri.Color([0.75,0, 0, 255]);
+                        var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255,0, 0,0.25]), 2);
+                        //var polySymbolRed = new SimpleFillSymbol(SimpleFillSymbol.STYLE_NONE,
+                        //    symbol,
+                        //    color
+                        //    );
+                        //polySymbolRed.color = color;
+
+                        polySymbolRed = new SimpleFillSymbol(SimpleFillSymbol.STYLE_NONE,
+                            new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]), 2),
+                            new Color([255, 255, 0, 0.25]));
+
+                        //polySymbolRed.color.a = 0.5;
+
+                        var graphic = new esri.Graphic(polygon, polySymbolRed);
+                        graphic.attr("ReclassifyMinValue", response.WaterDepthContourPlaneArray[i].ContourPlane[j].ReclassifyMinValue);
+                        pGraphicsLayer.add(graphic);
+                    }
+
+                }
+                app.map.addLayer(pGraphicsLayer);
+            }
+            else {
+                alert(response.state);
+            }
+
+
+        });
+    }
+    /**
+     * /降雨量等值线
+     */
+    function ContourLine() {
+        require([
+        "esri/map", "esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol","esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer","esri/config",
+        "dojo/domReady!"
+        ], function (esriRequest, Polyline, CartographicLineSymbol, Graphic,esriConfig) {
+            var content = {
+                'rainfall': "[{'x':385012.49519999977,'y':3638396.1798999999,'value':52.1}," + 
+"{'x':389499.83750000037,'y':3637443.6779999994,'value':49.1}," + 
+"{'x':390791.00679999962,'y':3640512.8508000001,'value':51.7}," + 
+"{'x':388526.16889999993,'y':3641105.5186999999,'value':42.1}," + 
+"{'x':385837.99689999968,'y':3640618.6843999997,'value':55.1}," + 
+"{'x':385245.32899999991,'y':3642502.5215000007,'value':55.1}," + 
+"{'x':386853.99890000001,'y':3644513.3587999996,'value':57.1}," + 
+"{'x':390600.5064000003,'y':3643328.0230999999,'value':49.1}," + 
+"{'x':388822.5027999999,'y':3644217.0249000005,'value':47.1}," + 
+"{'x':390113.67210000008,'y':3645423.5273000002,'value':60.1}," + 
+"{'x':388145.16810000036,'y':3646143.1953999996,'value':58.1}," + 
+"{'x':386959.83239999972,'y':3646524.1962000001,'value':57.1}," + 
+"{'x':389965.50509999972,'y':3647413.1980000008,'value':55.1}," + 
+"{'x':392755.27740000002,'y':3646016.1952,'value':59.1}," + 
+"{'x':392501.27680000011,'y':3641655.8530999999,'value':51}," + 
+"{'x':392818.77749999985,'y':3639010.0144999996,'value':51.1}]",'f': "json"
+            };
+            var soeurl = "http://172.30.16.198:6080/arcgis/rest/services/SuZhouDem/MapServer/exts/ContourRestSOE2/RainfallContourLine";
+            //var rquest = esriRequest({
+            //    url: soeurl,
+            //    content: content,
+            //    handleAs: "json",
+            //    callbackParamName: "callback"
+            //});
+            
+            StartPoint = "";
+            EndPoint = "";
+
+            app.map.graphics.clear();
+
+            esri.request({
+                url: soeurl,
+                content: content,
+                handleAs: "json",
+                callbackParamName: "callback",
+                load: drawPolyline,
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+
+
+
+
+        });
+    }
+
+    /**
+     * /降水量等值面
+     */
+    function ContourPlane() {
+        require([
+        "esri/map", "esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol", "esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer", "esri/config",
+        "dojo/domReady!"
+        ], function (esriRequest, Polyline, CartographicLineSymbol, Graphic, esriConfig) {
+            var content = {
+                'rainfall': "[{'x':385012.49519999977,'y':3638396.1798999999,'value':52.1}," +
+"{'x':389499.83750000037,'y':3637443.6779999994,'value':49.1}," +
+"{'x':390791.00679999962,'y':3640512.8508000001,'value':51.7}," +
+"{'x':388526.16889999993,'y':3641105.5186999999,'value':42.1}," +
+"{'x':385837.99689999968,'y':3640618.6843999997,'value':55.1}," +
+"{'x':385245.32899999991,'y':3642502.5215000007,'value':55.1}," +
+"{'x':386853.99890000001,'y':3644513.3587999996,'value':57.1}," +
+"{'x':390600.5064000003,'y':3643328.0230999999,'value':49.1}," +
+"{'x':388822.5027999999,'y':3644217.0249000005,'value':47.1}," +
+"{'x':390113.67210000008,'y':3645423.5273000002,'value':60.1}," +
+"{'x':388145.16810000036,'y':3646143.1953999996,'value':58.1}," +
+"{'x':386959.83239999972,'y':3646524.1962000001,'value':57.1}," +
+"{'x':389965.50509999972,'y':3647413.1980000008,'value':55.1}," +
+"{'x':392755.27740000002,'y':3646016.1952,'value':59.1}," +
+"{'x':392501.27680000011,'y':3641655.8530999999,'value':51}," +
+"{'x':392818.77749999985,'y':3639010.0144999996,'value':51.1}]", 'f': "json"
+            };
+            var soeurl = "http://172.30.16.198:6080/arcgis/rest/services/SuZhouDem/MapServer/exts/ContourRestSOE2";
+            //var rquest = esriRequest({
+            //    url: soeurl,
+            //    content: content,
+            //    handleAs: "json",
+            //    callbackParamName: "callback"
+            //});
+
+            StartPoint = "";
+            EndPoint = "";
+
+            app.map.graphics.clear();
+
+            esri.request({
+                url: soeurl,
+                content: content,
+                handleAs: "json",
+                callbackParamName: "callback",
+                load: drawPolygon,
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+
+
+
+
+        });
+    }
+    /**
+     * /积水点等值线
+     */
+    function WaterContourLine() {
+        require([
+        "esri/map", "esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol", "esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer", "esri/config",
+        "dojo/domReady!"
+        ], function (esriRequest, Polyline, CartographicLineSymbol, Graphic, esriConfig) {
+
+            var WaterPointArray = new Array();
+            var WaterPoint1 = new Object();
+            WaterPoint1.x = 387190;
+            WaterPoint1.y = 3639090;
+            WaterPoint1.value = 0.3;
+            WaterPointArray.push(WaterPoint1);
+
+            var WaterPoint2 = new Object();
+            WaterPoint2.x = 392234;
+            WaterPoint2.y = 3641170;
+            WaterPoint2.value = 0.4;
+            WaterPointArray.push(WaterPoint2);
+
+            var WaterPoint3 = new Object();
+            WaterPoint3.x = 392267;
+            WaterPoint3.y = 3644670;
+            WaterPoint3.value = 2.3;
+            WaterPointArray.push(WaterPoint3);
+
+            //var WaterPoint4 = new Object();
+            //WaterPoint4.x = 391920;
+            //WaterPoint4.y = 3646210;
+            //WaterPoint4.value = 0.3;
+            //WaterPointArray.push(WaterPoint4);
+
+            //var WaterPoint5 = new Object();
+            //WaterPoint5.x = 388513;
+            //WaterPoint5.y = 3637530;
+            //WaterPoint5.value = 0.6;
+            //WaterPointArray.push(WaterPoint5);
+
+            var para = new Object();
+            para.WaterDepth = JSON.stringify(WaterPointArray);
+            para.f = "json";
+            var content = {
+                'WaterDepth': "[" +
+"{'x':387190,'y':3639090,'value':0.3}," +
+"{'x':392234,'y':3641170,'value':0.2}," +
+"{'x':392267,'y':3644670,'value':0.3}," +
+"{'x':391920,'y':3646210,'value':0.3}," +
+"{'x':388513,'y':3637530,'value':0.1}" + 
+         "]", 'f': "json"
+            };
+            var soeurl = "http://172.30.16.198:6080/arcgis/rest/services/SuZhouDem/MapServer/exts/ContourRestSOE2/WaterDepthContourLine";
+            //var rquest = esriRequest({
+            //    url: soeurl,
+            //    content: content,
+            //    handleAs: "json",
+            //    callbackParamName: "callback"
+            //});
+
+            StartPoint = "";
+            EndPoint = "";
+
+            app.map.graphics.clear();
+
+            esri.request({
+                url: soeurl,
+                content: para,
+                handleAs: "json",
+                callbackParamName: "callback",
+                load: drawWaterLine,
+                error: function (error) {
+                    alert(error);
+                }
+            });
+
+
+
+
+        });
+    }
+
+    /**
+     * /积水点等值面
+     */
+    function WaterContourPlane() {
+        require([
+        "esri/map", "esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol", "esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer", "esri/config",
+        "dojo/domReady!"
+        ], function (esriRequest, Polyline, CartographicLineSymbol, Graphic, esriConfig) {
+
+            var WaterPointArray = new Array();
+            var WaterPoint1 = new Object();
+            WaterPoint1.x = 387190;
+            WaterPoint1.y = 3639090;
+            WaterPoint1.value = 0.3;
+            WaterPointArray.push(WaterPoint1);
+
+            var WaterPoint2 = new Object();
+            WaterPoint2.x = 392234;
+            WaterPoint2.y = 3641170;
+            WaterPoint2.value = 0.4;
+            WaterPointArray.push(WaterPoint2);
+
+            var WaterPoint3 = new Object();
+            WaterPoint3.x = 392267;
+            WaterPoint3.y = 3644670;
+            WaterPoint3.value = 2.3;
+            WaterPointArray.push(WaterPoint3);
+
+            //var WaterPoint4 = new Object();
+            //WaterPoint4.x = 391920;
+            //WaterPoint4.y = 3646210;
+            //WaterPoint4.value = 0.3;
+            //WaterPointArray.push(WaterPoint4);
+
+            //var WaterPoint5 = new Object();
+            //WaterPoint5.x = 388513;
+            //WaterPoint5.y = 3637530;
+            //WaterPoint5.value = 0.6;
+            //WaterPointArray.push(WaterPoint5);
+
+            var para = new Object();
+            para.WaterDepth = JSON.stringify(WaterPointArray);
+            para.f = "json";
+            var content = {
+                'WaterDepth': "[" +
+"{'x':387190,'y':3639090,'value':0.3}," +
+"{'x':392234,'y':3641170,'value':0.2}," +
+"{'x':392267,'y':3644670,'value':0.3}," +
+"{'x':391920,'y':3646210,'value':0.3}," +
+"{'x':388513,'y':3637530,'value':0.1}" +
+         "]", 'f': "json"
+            };
+            var soeurl = "http://172.30.16.198:6080/arcgis/rest/services/SuZhouDem/MapServer/exts/ContourRestSOE2/WaterDepthContourPlane";
+            //var rquest = esriRequest({
+            //    url: soeurl,
+            //    content: content,
+            //    handleAs: "json",
+            //    callbackParamName: "callback"
+            //});
+
+            StartPoint = "";
+            EndPoint = "";
+
+            app.map.graphics.clear();
+
+            esri.request({
+                url: soeurl,
+                content: para,
+                handleAs: "json",
+                callbackParamName: "callback",
+                load: drawWaterPlane,
+                error: function (error) {
+                    alert(error);
+                }
+            });
+
+
+
+
+        });
+    }
+</script>
+</head>
+
+<body>
+  <div style="height:120px;width:260px;float:left;margin-right:60px;">
+      <input id="but1" type="button" value="降雨量等值线绘制" style="height:30px;width:150px;" onclick="ContourLine()" />
+      <input id="Button1" type="button" value="降雨量等值面绘制" style="height:30px;width:150px;" onclick="ContourPlane()" />
+      <input id="Button2" type="button" value="积水等值线绘制" style="height:30px;width:150px;" onclick="WaterContourLine()" />
+      <input id="Button3" type="button" value="积水等值面绘制" style="height:30px;width:150px;" onclick="WaterContourPlane()" />
+  </div>
+  <div id="map"></div>
+    
+</body> 
+
+</html>
+ 

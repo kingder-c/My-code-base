@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.17/esri/css/esri.css">
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script src="https://js.arcgis.com/3.17/"></script>
+    <script>
+        var map;
+        var map2;
+        var oDivs;
+
+        require(["esri/map", "esri/geometry/Extent", "dojo/domReady!"], function (Map, Extent) {
+            map = new Map("map", {
+                basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+                center: [-122.45, 37.75], // longitude, latitude
+                zoom: 13
+            });
+
+            oDivs = document.getElementById('magnifyingDIV');
+            
+            map2 = new Map("magnifyingDIV", {
+                basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+                center: [-122.45, 37.75], // longitude, latitude
+                slider:false
+            });
+
+
+            map.on("mouse-move", function (evt) {
+                //var MaxZoom = map.getMaxZoom();
+
+                var pExtent = new Extent(evt.mapPoint.x - 50, evt.mapPoint.y - 50, evt.mapPoint.x + 50, evt.mapPoint.y + 50, evt.mapPoint.spatialReference);
+                map2.setExtent(pExtent);
+
+                //map2.setZoom(MaxZoom - 3);
+                //map2.centerAt(evt.mapPoint);
+            });
+
+
+
+
+        });
+
+
+        
+
+        window.onload = function () {
+            document.onmousemove = function (ev) {
+                var oEvent = ev || event;
+                oDivs.style.top = oEvent.clientY + 'px';
+                oDivs.style.left = oEvent.clientX + 'px';
+            };
+
+        };
+
+
+
+
+    </script>
+
+<!--      "-->
+
+
+  </head>
+
+  <body>
+      <div id="magnifyingDIV" style="height:300px;width:300px;background-color:ActiveCaption;border-radius:150px;border:solid rgb(100,100,100) 1px;margin-left:0px;margin-top:0px;z-index:1000;position: absolute;"></div>
+    <div id="map" style="z-index:0;"></div>
+      
+  </body>
+</html>

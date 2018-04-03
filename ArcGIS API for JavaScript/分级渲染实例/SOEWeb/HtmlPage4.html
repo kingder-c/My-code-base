@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD Xhtml 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>放大镜效果</title>
+<style type="text/css">
+*{margin:0;padding:0;}
+#smallimg{width:360px;float:left;position:relative;border:1px solid red;}
+#smallimg img{ width:360px;}
+#bigimg{float:left;width:400px;height:400px;margin-left:40px;border:1px solid #ccc;display:none;}
+#showimg{width:100px;height:100px;background:#fff;cursor:move; position:absolute;border:1px solid #666;opacity:0.5;filter:alpha(opacity=50);display:none;}
+</style>
+</head>
+<body>
+<div id="smallimg" style="height:50%;width:50%">
+ <img src="2.png" alt=""/>
+ <div id="showimg" style="border-radius:50%;"> </div>
+</div>
+<div id="bigimg"> </div>
+<link rel="stylesheet" href="https://js.arcgis.com/3.17/esri/css/esri.css">
+<script src="https://js.arcgis.com/3.17/"></script>
+
+<script type="text/javascript">
+
+    var app = {};
+    require([
+        "esri/map", "esri/geometry/Point", "esri/request",
+        "esri/layers/ArcGISDynamicMapServiceLayer",
+        "dojo/domReady!"
+    ],
+      function (
+        Map, Point, esriRequest,
+        ArcGISDynamicMapServiceLayer
+      ) {
+
+          app.map = new Map("smallimg");
+
+          var DynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/宿州DEM/MapServer");
+
+          app.map.addLayer(DynamicMapServiceLayer);
+
+
+      });
+
+
+
+
+    var $ = function (id) { return typeof id == "string" ? document.getElementById(id) : id }
+    var smallimg = $("smallimg");
+    var showimg = $("showimg");//滤镜图片
+    var bigimg = $("bigimg");
+    var small_url = smallimg.getElementsByTagName("img")[0].getAttribute("src");
+    var show_half = maxWidth = maxHeight = 0;
+    smallimg.onmouseover = function () {
+        showimg.style.display = "block";
+        bigimg.style.display = "inline";
+        show_half = showimg.offsetHeight / 2;
+        maxWidth = smallimg.clientWidth - showimg.offsetWidth;
+        maxHeight = smallimg.clientHeight - showimg.offsetHeight;
+        //上面两个变量指明showimg允许活动的区域
+    };
+    smallimg.onmousemove = function (e) {
+        var e = window.event ? window.event : e;
+        var num = bigimg.clientWidth / showimg.clientWidth;
+        var Top = e.clientY - smallimg.offsetTop - show_half;
+        var Left = e.clientX - smallimg.offsetLeft - show_half;
+        //获取当前移动的showimg位置 计算方法是 鼠标坐标 - 最外面容器的坐标 - 盒子的宽(高)的/2 
+        Top = Top < 0 ? 0 : Top > maxHeight ? maxHeight : Top;
+        Left = Left < 0 ? 0 : Left > maxWidth ? maxWidth : Left;
+        showimg.style.top = Top + "px";
+        showimg.style.left = Left + "px";
+        bigimg.style.background = "url(" + small_url + ") -" + Left * num + "px -" + Top * num + "px no-repeat";
+    };
+    smallimg.onmouseout = function () {
+        showimg.style.display = "none";
+        bigimg.style.background = "";
+        bigimg.style.display = "none"
+    };
+</script>
+</body>
+</html>

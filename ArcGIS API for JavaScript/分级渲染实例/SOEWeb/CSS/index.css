@@ -1,0 +1,43 @@
+﻿body {
+}
+.legendBoard {
+    position: fixed;
+    right: 20px;
+    top: 0%;
+    width: 50px;
+    /*padding: 3px 10px;*/
+    display: none;
+    background: #EAEAFF;
+    width: 220px;
+    overflow: hidden;
+}
+
+.legendBoard-title {
+    height: 30px;
+    line-height: 30px;
+    padding: 3px 10px;
+    background: #32C5D2;
+    font-weight: bold;
+}
+
+.legendBoard-head {
+    text-align: center;
+}
+
+.legendBoard-contour {
+    padding: 5px 10px;
+}
+
+#legend-contour {
+    margin: 0;
+    padding: 0;
+}
+
+.legend-close {
+    cursor: pointer;
+}
+
+    .legend-close:hover {
+        color: red;
+    }
+

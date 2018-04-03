@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.17/esri/css/esri.css">
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+
+      .magnifying-glass {
+          /*border-radius: 50%;*/
+          border: 1px solid gray;
+          box-shadow: 0 0 5px gray;
+          position: absolute;
+          overflow: hidden;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box; 
+          top: 0px;
+          right: 0px; 
+          height: 100%; 
+          width: 100%;  
+        }
+
+        #mmap{
+	        position:absolute;
+	        height: 100%; 
+          width:100%;
+	        margin: 0; 
+          padding: 0;
+          top: 0px;
+          right:0px;    
+        }
+
+        .magnifying-glass-webkit {
+          border-radius: 50%;
+          -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+        }
+
+
+
+
+
+
+
+
+
+
+
+    </style>
+    <script src="https://js.arcgis.com/3.17/"></script>
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+        var map;
+        var mmap;
+        var radius = 80;
+        var levelMax = 0;
+
+        var divID = "MagnifyMap";
+        require(["esri/map", "esri/geometry/Extent", "dojo/domReady!"], function (Map) {
+            map = new Map("map", {
+                basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+                center: [-122.45, 37.75], // longitude, latitude
+                zoom: 13
+            });
+
+            var mapDiv = $("#map");
+
+            mapDiv.append('<div id="' + divID + '" class="magnifying-glass"><div id="mmap"></div></div>');
+
+            mmap = new Map("mmap", {
+                slider: false,
+                logo: false
+            });
+            $("#mmap").css("width", map.width);
+            $("#mmap").css("height", map.height);
+
+            
+            
+            mmap = new Map("mmap", {
+                basemap: "topo",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+                center: [-122.45, 37.75], // longitude, latitude
+                slider:false
+            });
+
+            //var maplevel = map.getLevel();
+
+            //mmap.setLevel(-2);
+            //mmap.centerAt(map.extent.getCenter());
+
+            $("#" + divID).css("width", radius * 2);
+            $("#" + divID).css("height", radius * 2);
+            $("#" + divID).css("border-radius", "50%");
+            $("#" + divID).hide();
+
+            mmap.disablePan();
+            mmap.disableDoubleClickZoom();
+            mmap.disableScrollWheelZoom();
+            mmap.disableSnapping();
+            mmap.disableKeyboardNavigation();
+            map.disablePan();
+
+
+            map.on("mouse-move", function (e) {
+                e.stopPropagation();
+                map.disablePan();
+                mmap.disablePan();
+                mmap.disableDoubleClickZoom();
+                mmap.disableScrollWheelZoom();
+                mmap.disableSnapping();
+                mmap.disableKeyboardNavigation();
+
+                $("#" + divID).show();
+                var offsetX = e.screenPoint.x;
+                var offsetY = e.screenPoint.y;
+                var mapx = e.mapPoint.x;
+                var mapy = e.mapPoint.y;
+                refreshDivSize(offsetX, offsetY, mapx, mapy);
+            });
+
+        });
+
+
+
+
+    </script>
+
+<!--      "-->
+
+
+  </head>
+
+  <body>
+      
+    <div id="map" style="z-index:0;"></div>
+      
+  </body>
+</html>

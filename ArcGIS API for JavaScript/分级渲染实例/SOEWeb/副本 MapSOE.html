@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FeatureLayer</title>
+
+<link rel="stylesheet" href="http://10.168.17.212/arcgis_js_api/library/3.14/3.14/esri/css/esri.css" />
+    <link href="../../theme/emergency/bootstrap.min.css" rel="stylesheet" />
+    <link href="../../js/Bootstrap/Version3/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../../js/jQuery/Plugins/DataTables/jquery.dataTables.css" rel="stylesheet" />
+    <link href="../../js/jQuery/Plugins/DataTables/dataTables.bootstrap.css" rel="stylesheet" />
+    <link href="../../js/jQuery/Theme/bootstrap/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+    <link href="../../js/jQuery/Plugins/jsPanel/jquery.jspanel.min.css" rel="stylesheet" />
+    <link href="../../js/jQuery/Plugins/select2/select2.css" rel="stylesheet" />
+    <link href="../../js/jQuery/Plugins/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <script src="../../js/jQuery/jquery.js"></script>
+    <script src="../../js/Bootstrap/Version3/js/bootstrap.min.js"></script>
+    <script src="../../js/jQuery/Plugins/DataTables/jquery.dataTables.min.js"></script>
+    <script src="../../js/jQuery/Plugins/DataTables/dataTables.bootstrap.js"></script>
+    <script src="../../js/Noty/packaged/jquery.noty.packaged.min.js"></script>
+    <script src="../../js/jQuery/Plugins/jsPanel/jquery.jspanel.min.js"></script>
+    <script src="../../js/jQuery/Plugins/jquery-ui.min.js"></script>
+    <script src="../../js/jQuery/Plugins/select2/select2.min.js"></script>
+    <script src="../../js/jQuery/Plugins/slimScroll/jquery.slimscroll.min.js"></script>
+    <script src="../../js/jQuery/Plugins/zTree/jquery.ztree.all-3.5.js"></script>
+    <script type="text/javascript" src="http://10.168.17.212/arcgis_js_api/library/3.14/3.14/init.js"></script>
+
+<style>
+html, body, #map {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+</style>
+
+<script>
+    var StartPoint = "";
+    var EndPoint = "";
+    var app = {};
+    require([
+        "esri/map", "esri/geometry/Point", "esri/request","esri/dijit/Scalebar",
+        "esri/layers/ArcGISDynamicMapServiceLayer",
+        "dojo/domReady!"
+    ],
+      function (
+        Map, Point, Scalebar, esriRequest,
+        ArcGISDynamicMapServiceLayer
+      ) {
+          
+          var mapOptions = {
+              basemap: "topo",
+              logo: true,
+              nav: true,
+              showAttribution: true,
+              force3DTransforms: true,
+              optimizePanAnimation: true,
+              slider: true,
+              sliderPosition: 'top-left',
+              sliderStyle: 'large',
+              sliderLabels: ["1", "<div class='map_ruleLabel'>2</div>", "", "<div class='map_ruleLabel'>3</div>", "", "", "<div class='map_ruleLabel'>4</div>", "5", "6", "7", "8", "9"],
+              zoom: 3,
+              wrapAround180: true,
+              center: [114.3153520000, 30.4855280000],
+              title: "HuBei",
+              thumbnailUrl: ""
+          };
+
+
+
+          app.map = new Map("map", mapOptions);
+
+          var DynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/route/routeAnalysis03/MapServer");
+
+          app.map.addLayer(DynamicMapServiceLayer);
+
+          app.map.on("click", function (evt) {
+              if (StartPoint == "") {
+                  StartPoint = evt.mapPoint;
+              }
+              else {
+                  EndPoint = evt.mapPoint;
+              }
+          });
+
+
+
+          
+
+      });
+
+
+
+    function drawPolyline(response) {
+        require(["esri/map", "esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol", "esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer", "esri/config",
+        "dojo/domReady!"], function (esriRequest, Polyline, CartographicLineSymbol, Graphic, esriConfig) {
+            
+            var line = new esri.geometry.Polyline(response);
+            var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 0]), 12);
+            var graphic = new esri.Graphic(line, symbol);
+            app.map.graphics.add(graphic);
+
+
+
+            //for (var i = 0; i < response.paths.length; i++) {
+            //    var pathDuan = JSON.stringify(response.paths[i]);
+            //    var line = new esri.geometry.Polyline([[0.481600001,0.118299998],[12958938.7621,4854421.353299998],[12958944.332600001,4854234.986699998],[12958947.4584,4854184.595399998]]);
+
+            //    var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 0]), 2);
+            //    var graphic = new esri.Graphic(line, symbol);
+            //    map.graphics.add(graphic);
+            //}
+
+        });
+    }
+
+    function routeAnalysis() {
+        require([
+        "esri/map", "esri/geometry/Point", "esri/request", "esri/geometry/Polyline", "esri/symbols/CartographicLineSymbol","esri/graphic",
+        "esri/layers/ArcGISDynamicMapServiceLayer","esri/config",
+        "dojo/domReady!"
+        ], function (esriRequest, Polyline, CartographicLineSymbol, Graphic,esriConfig) {
+            var content = {
+                'StartPoint': "{x:" + StartPoint.x + ",y:" + StartPoint.y + "}",
+                'EndPoint': "{x:" + EndPoint.x + ",y:" + EndPoint.y + "}",
+                'f': "json"
+            };
+            var soeurl = "http://localhost:6080/arcgis/rest/services/route/routeAnalysis03/MapServer/exts/ServerObjectExtensionsTest/RouteCompute01";
+            //var rquest = esriRequest({
+            //    url: soeurl,
+            //    content: content,
+            //    handleAs: "json",
+            //    callbackParamName: "callback"
+            //});
+            
+            StartPoint = "";
+            EndPoint = "";
+
+            app.map.graphics.clear();
+
+            esri.request({
+                url: soeurl,
+                content: content,
+                handleAs: "json",
+                callbackParamName: "callback",
+                load: drawPolyline,
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+
+
+
+
+        });
+    }
+
+</script>
+</head>
+
+<body>
+  <div style="height:30px;width:90px;float:left;margin-right:60px;"><input id="but1" type="button" value="最短路径" style="height:30px;width:90px;" onclick="routeAnalysis()" /></div>
+  <div id="map"></div>
+    
+</body> 
+
+</html>
+ 

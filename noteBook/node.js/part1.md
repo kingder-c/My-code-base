@@ -19,5 +19,16 @@ sqlite
 - **IE浏览器**：Tridend引擎
 - **Edge浏览器**：EdgeHTML引擎（Trident的一个分支）
 
+### 工作原理
+1. 解析HTML构建Dom树（Document Object Model，文档对象模型），DOM是W3C组织推荐的处理可拓展标记语言的标准程序接口。
+2. 构建*渲染树*，*渲染树*并不简单的等同于*DOM树*，因为像`head标签 或 display：none` 这样的元素就没有必要放到*渲染树*中了，但是它们在*DOM树*中。
+3. 对*渲染树*进行布局，定位坐标和大小，确定是否换行，确定Position。overflow，z-index等等，这个过程叫`layout`或`"reflow"`
+4. 绘制*渲染树*，调用操作系统底层API进行绘图操作。
+
+
+### 渲染引擎工作原理
 ![渲染引擎工作原理](http://ouewomi2z.bkt.clouddn.com/18-4-20/64708357.jpg)
 ![webkit工作原理](http://ouewomi2z.bkt.clouddn.com/18-4-20/10792662.jpg)
+![Gecko工作原理](http://ouewomi2z.bkt.clouddn.com/18-4-20/32453873.jpg)
+
+

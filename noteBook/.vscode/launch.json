@@ -9,7 +9,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "启动 Chrome 并打开 localhost",
-            "url": "http://localhost:8010/Vue.js/3.V-cloak学习/v-cloak学习.html",
+            "url": "http://localhost:8010/Vue.js/4.基本操作/v-0n绑定事件.html",
             "webRoot": "${workspaceFolder}"
         }
     ]

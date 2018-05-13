@@ -10,17 +10,28 @@
 </head>
 
 <body>
-    <div>
-        <button id="app1" v-bind:title="title">button</button>
+    <div id="app1">
+
+        <input type="button" value="button" :title="title1+'123'" v-on:click="show">
+        <!-- v-on:的做缩写是@ -->
+        <input type="button" value="button" :title="title1+'123'" @click="show">
     </div>
 
     <script>
         var vue = new Vue({
             el: "#app1",
             data: {
-                title: "123"
+                title: "123",
+                title1:"自定义标题内容"
+            },
+            methods:{
+                show:function(){
+                    alert("hahahah");
+                }
+
             }
         })
+
     </script>
 </body>
 

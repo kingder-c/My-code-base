@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+    <script src="haha.js"></script>
+    <style>
+    [v-cloak]{
+        display: none;
+    }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 使用v-clock能够解决差值表达式闪烁的问题 -->
+        <p v-cloak>{{msg}}</p>
+        <!-- v-text默认是没有闪烁的问题的 -->
+        <!-- v-text会覆盖元素中的原本内容，但是差值表达式只会替换自己的这个占位符，不会吧整个内容清空 -->
+        <h1 v-text="msg"></h1>
+        <p v-html="msg2"></p>
+    </div>
+    <script>
+    var vm=new Vue({
+        el:'#app',
+        data:{
+            msg:123,
+            msg2:"<h1>1231342345</h1>"
+        }
+    })
+    
+    </script>
+</body>
+</html>

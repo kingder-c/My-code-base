@@ -4,9 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="../lib/vue.js"></script>
     <title>跑马灯效果</title>
 </head>
 <body>
-    
+    <div id="app1">
+        <button @click="start">浪起来</button>
+        <button @click="stop">别浪</button>
+        <h3>{{message}}</h3>
+    </div>
+
+
+    <script>
+        var app1=new Vue({
+            el:"#app1",
+            data:{
+                message:"猥琐发育~~别浪~~",
+                intervalId:null,
+            },
+            methods:{
+                //es6最新写法
+                start(){
+                    //箭头函数内部的this和外部的this保持一致
+                    if(this.intervalId==null)
+                    this.intervalId=setInterval(()=>{
+                        app1.message=app1.message.substring(1,app1.message.length)+app1.message.substring(0,1);
+                    },100)
+                    
+                },
+                stop:function(){
+                    clearInterval(app1.intervalId);
+                    this.intervalId=null
+                }
+
+            }
+        })
+    </script>
 </body>
 </html>

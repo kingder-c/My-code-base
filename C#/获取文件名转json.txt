@@ -1,0 +1,23 @@
+string name = context.Request["name"];
+            string result = "{\"aaData\": [";
+            try
+            {
+                String path = HttpContext.Current.Request.PhysicalApplicationPath + "\\WaterLogging\\EmergencyPlan\\EmergencyPlan";
+                DirectoryInfo folder = new DirectoryInfo(path);
+                foreach (FileInfo file in folder.GetFiles("*.*"))
+                {
+                    if(file.Name.IndexOf(name)!=-1)
+                        result += "{\"id\": \"" + file.Name + "\",\"name\": \"" + file.Name + "\"},";
+
+                    //allFile.Add(new EmergencyListModel(file.Name, file.Name));
+                }
+                //result = Robin.EntLib.Common.Helper.JsonHelper.SerializeObject(formlist);
+                result = result.Substring(0, result.LastIndexOf(","));
+                result += "]}";
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return result;

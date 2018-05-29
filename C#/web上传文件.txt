@@ -1,0 +1,8 @@
+ HttpFileCollection files = HttpContext.Current.Request.Files;
+            for (int i = 0; i < files.Count; i++)
+            {
+                HttpPostedFile postedFile = files[i];
+                postedFile.SaveAs(System.AppDomain.CurrentDomain.BaseDirectory + "\\WaterLogging\\EmergencyPlan\\EmergencyPlan\\" + System.IO.Path.GetFileName(postedFile.FileName));
+                // dr.driver_phone = postedFile.FileName;  
+            }
+            return "方法执行结束";

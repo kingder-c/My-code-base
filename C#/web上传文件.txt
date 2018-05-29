@@ -6,3 +6,37 @@
                 // dr.driver_phone = postedFile.FileName;  
             }
             return "方法执行结束";
+
+
+
+html：
+
+                <div style="width:70px;position:relative;background-color:#337ab7;border-radius:4px;height:33.56px;line-height:33.56px;text-align:center;color:white">
+                    <!--<input type="button" class="btn btn-primary" value="添加" onclick="add()" />-->
+                    
+                    <label style="font-weight:unset">预案上传<input type="file" id="upLoadFile" style="position:absolute;top:0;right:0;opacity:0;filter:alpha(opacity)" /></label>
+                </div>
+
+
+js：
+document.getElementById("upLoadFile").onchange = function () {
+                var fd = new FormData();
+                fd.append("upload", 1);
+                fd.append("upLoadFile", $("#upLoadFile").get(0).files[0]);
+                $.ajax({
+                    url: "EmergencyPlan.ashx?Action=addFile",
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    data: fd,
+                    success: function (d) {
+                        noty({ text: "上传成功", type: "success", layout: "topCenter", timeout: 2000 });
+                        console.log(d);
+                        rTable.fnDestroy();
+                        refeshDataTable();
+                    },
+                    error: function () {
+                        noty({ text: "上传失败，请检查网络", type: "error", layout: "topCenter", timeout: 2000 });
+                    }
+                });
+            }

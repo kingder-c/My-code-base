@@ -1,0 +1,20 @@
+            string result = "false";
+            try
+            {
+                string id = context.Request.QueryString["Id"];
+                String path = HttpContext.Current.Request.PhysicalApplicationPath + "\\WaterLogging\\EmergencyPlan\\EmergencyPlan\\" + id;
+                if (File.Exists(path))
+                {
+                    //如果存在则删除
+                    File.Delete(path);
+                    result = "true";
+                }
+                else{
+                    result = "文件不存在";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "异常："+ex.Message;
+            }
+            return result;

@@ -14,6 +14,8 @@
         <!-- v-bind智能实现表单单项数据绑定，从m到v不能实现数据的双向绑定 -->
         <input type="text" :value="message">
 
+        <!-- v=model可以实现双向数据绑定 -->
+        <!-- V-model只能绑定表单元素 -->
         <input type="text" v-model:value="message">
     </div>
     <script>

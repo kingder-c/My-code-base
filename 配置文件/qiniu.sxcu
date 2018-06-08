@@ -1,0 +1,12 @@
+﻿{
+  "Name": "qiniu",
+  "DestinationType": "ImageUploader, TextUploader, FileUploader",
+  "RequestURL": "http://up-z1.qiniu.com/",
+  "FileFormName": "file",
+  "Arguments": {
+    "key": "%y%yy%d%h%mi-%ra.png",
+    "file": "$input$",
+    "token": "Dk3fFzrCoX6XQZJFdlMtIKB-uqjnUaaj4I_Es4tv:XholLUZwl6NkuvgLtEgO9IRDKTQ=:eyJzY29wZSI6ImtpbmdkZXIiLCJkZWFkbGluZSI6MTU0MzkxNDAwNn0="
+  },
+  "URL": "ouewomi2z.bkt.clouddn.com/$json:key$"
+}

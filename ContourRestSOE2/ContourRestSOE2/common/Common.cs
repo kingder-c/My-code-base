@@ -781,7 +781,7 @@ namespace ContourRestSOE2.common
             for (int i = 0; i < c; i++)
             {
                 layerInfor = layerInfos.get_Element(i);
-                if (layerInfor.IsFeatureLayer == true)
+                if (layerInfor.IsFeatureLayer == true)//不寻找要素图层
                 {
                     layerIndex = i;
                     break;

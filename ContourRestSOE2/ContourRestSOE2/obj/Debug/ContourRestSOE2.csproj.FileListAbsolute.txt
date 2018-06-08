@@ -9,3 +9,8 @@ E:\code\1市政课题\ContourRestSOE2\ContourRestSOE2\obj\Debug\ContourRestSOE2.
 E:\code\1市政课题\ContourRestSOE2\ContourRestSOE2\obj\Debug\ContourRestSOE2.pdb
 E:\code\1市政课题\ContourRestSOE2\ContourRestSOE2\obj\Debug\ContourRestSOE2.csprojResolveAssemblyReference.cache
 E:\code\1市政课题\ContourRestSOE2\ContourRestSOE2\bin\Debug\ContourRestSOE2.soe
+D:\OneDrive\_经验zy（总结）\ContourRestSOE2\ContourRestSOE2\bin\Debug\ContourRestSOE2.dll
+D:\OneDrive\_经验zy（总结）\ContourRestSOE2\ContourRestSOE2\bin\Debug\ContourRestSOE2.pdb
+D:\OneDrive\_经验zy（总结）\ContourRestSOE2\ContourRestSOE2\bin\Debug\ContourRestSOE2.tlb
+D:\OneDrive\_经验zy（总结）\ContourRestSOE2\ContourRestSOE2\obj\Debug\ContourRestSOE2.dll
+D:\OneDrive\_经验zy（总结）\ContourRestSOE2\ContourRestSOE2\obj\Debug\ContourRestSOE2.pdb

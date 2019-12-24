@@ -1,6 +1,7 @@
     .title > div {
-        word-break: keep-all; /* ²»»»ĞĞ */
-        white-space: nowrap; /* ²»»»ĞĞ */
-        overflow: hidden; /* ÄÚÈİ³¬³ö¿í¶ÈÊ±Òş²Ø³¬³ö²¿·ÖµÄÄÚÈİ */
-        text-overflow: ellipsis; /* µ±¶ÔÏóÄÚÎÄ±¾Òç³öÊ±ÏÔÊ¾Ê¡ÂÔ±ê¼Ç(...) £»ĞèÓëoverflow:hidden;Ò»ÆğÊ¹ÓÃ¡£*/
+        word-break: keep-all; /* ä¸æ¢è¡Œ */
+        white-space: nowrap; /* ä¸æ¢è¡Œ */
+        overflow: hidden; /* å†…å®¹è¶…å‡ºå®½åº¦æ—¶éšè—è¶…å‡ºéƒ¨åˆ†çš„å†…å®¹ */
+        text-overflow: ellipsis; /* å½“å¯¹è±¡å†…æ–‡æœ¬æº¢å‡ºæ—¶æ˜¾ç¤ºçœç•¥æ ‡è®°(...) ï¼›éœ€ä¸overflow:hidden;ä¸€èµ·ä½¿ç”¨ã€‚*/
     }
+    
